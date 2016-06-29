@@ -7,15 +7,8 @@ function ccnl_fmri_glm(EXPT,model,subjects)
     cdir = pwd;
     if nargin < 2; subjects = 1:length(EXPT.subject); end
     
-    % overwrite existing SPM file
-    modeldir = fullfile('models',['model',num2str(model)]);
-    if exist(fullfile(modeldir,'SPM.mat'),'file')
-        delete(fullfile(modeldir,'SPM.mat'));
-    end
-    
     % generic design specification
     def = spm_get_defaults;
-    job.dir{1} = modeldir;
     job.timing.RT = EXPT.TR;
     job.timing.units = 'secs';
     job.timing.fmri_t = def.stats.fmri.t;
@@ -35,6 +28,14 @@ function ccnl_fmri_glm(EXPT,model,subjects)
     
     % subject-specific design specification
     for subj = subjects
+        
+        % overwrite existing SPM file
+        modeldir = fullfile('models',['model',num2str(model)],['subj',num2str(subj)]);
+        if exist(fullfile(modeldir,'SPM.mat'),'file')
+            delete(fullfile(modeldir,'SPM.mat'));
+        end
+        
+        job.dir{1} = modeldir;
         S = EXPT.subject(subj);
         job.mask{1} = fullfile(cdir,fileparts(S.functional{1}),'wBrain.nii');
         for i = 1:length(S.functional)
