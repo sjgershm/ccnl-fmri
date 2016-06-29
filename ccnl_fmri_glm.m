@@ -5,7 +5,7 @@ function ccnl_fmri_glm(EXPT,model,subjects)
     % USAGE: ccnl_fmri_glm(EXPT,model,[subjects])
     
     cdir = pwd;
-    if nargin < 2; subjects = 1:length(EXPT.subject); end
+    if nargin < 3; subjects = 1:length(EXPT.subject); end
     
     % generic design specification
     def = spm_get_defaults;
