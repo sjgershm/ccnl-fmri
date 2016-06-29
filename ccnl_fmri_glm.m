@@ -33,11 +33,12 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         
         job = job0;
         
-        % overwrite existing SPM file
+        % overwrite existing SPM file and beta images
         modeldir = fullfile('models',['model',num2str(model)],['subj',num2str(subj)]);
         if exist(fullfile(modeldir,'SPM.mat'),'file')
             delete(fullfile(modeldir,'SPM.mat'));
         end
+        delete(fullfile(modeldir,'*nii'));
         
         job.dir{1} = modeldir;
         S = EXPT.subject(subj);
