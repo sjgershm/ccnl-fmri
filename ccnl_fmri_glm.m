@@ -26,8 +26,12 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         job.bases.hrf.derivs = [0 0];
     end
     
+    job0 = job;
+    
     % subject-specific design specification
     for subj = subjects
+        
+        job = job0;
         
         % overwrite existing SPM file
         modeldir = fullfile('models',['model',num2str(model)],['subj',num2str(subj)]);
@@ -47,7 +51,9 @@ function ccnl_fmri_glm(EXPT,model,subjects)
             job.sess(i).multi_reg{1} = spm_file(fullfile(cdir,S.functional{i}),'prefix','rp_','ext','txt');    % motion regressors from realignment
         end
         
-        spm_run_fmri_spec(job);
+        job = spm_run_fmri_spec(job);
+        load(job.spmmat{1});
+        spm_spm(SPM);
         
         cd(cdir);
     end
