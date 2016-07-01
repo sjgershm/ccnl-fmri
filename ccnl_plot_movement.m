@@ -5,6 +5,8 @@ function ccnl_plot_movement(EXPT,subj)
     % USAGE: plot_movement(EXPT,subj)
     
     S = EXPT.subject(subj);
+    for i = 1:length(S.functional); S.functional{i} = fullfile(S.datadir,S.functional{i}); end
+    S.structural = fullfile(S.datadir,S.structural);
     P = [];
     for i = 1:length(S.functional)
         p = spm_vol(S.functional{i});

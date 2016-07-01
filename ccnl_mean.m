@@ -8,8 +8,7 @@ function ccnl_mean(EXPT,subjects)
     
     for subj = 1:length(subjects)
         i = subjects(subj);
-        pth = fileparts(EXPT.subject(i).structural);
-        P{subj} = fullfile(pth,'wBrain.nii');
+        P{subj} = fullfile(EXPT.subject(i).datadir,'wBrain.nii');
     end
     
     spm_mean(P);

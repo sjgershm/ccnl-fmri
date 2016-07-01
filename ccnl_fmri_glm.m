@@ -45,17 +45,19 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         job.dir{1} = modeldir;
         cd(modeldir);
         S = EXPT.subject(subj);
+        for i = 1:length(S.functional); S.functional{i} = fullfile(S.datadir,S.functional{i}); end
+        S.structural = fullfile(S.datadir,S.structural);
         job.mask{1} = [];
-        job.mask{1} = fullfile(cdir,fileparts(S.functional{1}),'wBrain.nii');
+        job.mask{1} = fullfile(S.datadir,'wBrain.nii');
         for i = 1:length(S.functional)
             multi = EXPT.create_multi(model,subj,i);
-            save(fullfile(cdir,modeldir,['multi',num2str(i)]),'-struct','multi');
+            save(fullfile(modeldir,['multi',num2str(i)]),'-struct','multi');
             job.sess(i).hpf = def.stats.fmri.hpf;   % high-pass filter
-            job.sess(i).scans{1} = spm_file(fullfile(cdir,S.functional{i}),'prefix','swu');
-            job.sess(i).multi{1} = fullfile(cdir,modeldir,['multi',num2str(i)]);
+            job.sess(i).scans{1} = spm_file(fullfile(S.datadir,S.functional{i}),'prefix','swu');
+            job.sess(i).multi{1} = fullfile(modeldir,['multi',num2str(i)]);
             job.sess(i).cond = struct('name',{},'onset',{},'duration',{},'tmod',{},'pmod',{},'orth',{});
             job.sess(i).regress = [];
-            job.sess(i).multi_reg{1} = spm_file(fullfile(cdir,S.functional{i}),'prefix','rp_','ext','txt');    % motion regressors from realignment
+            job.sess(i).multi_reg{1} = spm_file(fullfile(S.datadir,S.functional{i}),'prefix','rp_','ext','txt');    % motion regressors from realignment
         end
         
         job = spm_run_fmri_spec(job);

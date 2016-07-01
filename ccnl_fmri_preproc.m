@@ -26,6 +26,8 @@ function ccnl_fmri_preproc(EXPT,subjects)
     for subj = subjects
         
         S = EXPT.subject(subj); % subject structure
+        for i = 1:length(S.functional); S.functional{i} = fullfile(S.datadir,S.functional{i}); end
+        S.structural = fullfile(S.datadir,S.structural);
         
         %% Realign functional images; write movement parameters to rp*.txt
         spm_realign(S.functional);
