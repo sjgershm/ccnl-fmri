@@ -39,8 +39,9 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     
     cd(cdir);
     
-    %% Second-level analysis
+    %% Group-level analysis
     modeldir = fullfile(cdir,'models',['model',num2str(model)]);
+    save(fullfile(modeldir,'contrasts'),'contrasts');
     job.dir{1} = modeldir;
     job.multi_cov = []; job.cov = []; job.globalc.g_omit = 1; 
     job.globalm.glonorm = 1; job.globalm.gmsca.gmsca_no = 1;
