@@ -39,7 +39,8 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         
         % overwrite existing files
         modeldir = fullfile('models',['model',num2str(model)],['subj',num2str(subj)]);
-        if isdir(modeldir); rmdir(modeldir); end
+        if isdir(modeldir); rmdir(modeldir,'s'); end
+        mkdir(modeldir);
         
         job.dir{1} = modeldir;
         cd(modeldir);
@@ -47,8 +48,8 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         job.mask{1} = [];
         job.mask{1} = fullfile(cdir,fileparts(S.functional{1}),'wBrain.nii');
         for i = 1:length(S.functional)
-            multi = EXPT.create_multi(model,subj,run);
-            save(fullfile(cdir,modeldir,['multi',num2str(i)]),'multi');
+            multi = EXPT.create_multi(model,subj,i);
+            save(fullfile(cdir,modeldir,['multi',num2str(i)]),'-struct','multi');
             job.sess(i).hpf = def.stats.fmri.hpf;   % high-pass filter
             job.sess(i).scans{1} = spm_file(fullfile(cdir,S.functional{i}),'prefix','swu');
             job.sess(i).multi{1} = fullfile(cdir,modeldir,['multi',num2str(i)]);
