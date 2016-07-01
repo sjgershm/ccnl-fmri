@@ -6,14 +6,14 @@ function ccnl_view(model,contrast)
     %
     % Requires bspmview (http://www.bobspunt.com/bspmview/).
     
-    modeldir = fullfile('models',['model',num2str(model)]);
+    modeldir = fullfile(EXPT.modeldir,['model',num2str(model)]);
     load(fullfile(modeldir,'contrasts'));
     ix = find(strcmp(contrasts,contrast));
     if isempty(ix)
         error('Contrast not found');
     end
-    spmT = fullfile('models',['model',num2str(model)],sprintf('spmT_%04d.nii',ix));
-    struc = 'mean.nii';
+    spmT = fullfile(EXPT.modeldir,['model',num2str(model)],sprintf('spmT_%04d.nii',ix));
+    struc = fullfile(EXPT.modeldir,'mean.nii');
     if ~exist(struc,'file')
         bspmview(spmT);
     else

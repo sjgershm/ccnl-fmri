@@ -8,8 +8,8 @@ function ccnl_fmri_glm(EXPT,model,subjects)
     if nargin < 3; subjects = 1:length(EXPT.subject); end
     
     % create models folder if none exists
-    if ~isdir('models'); mkdir('models'); end
-    if ~isdir(fullfile('models',['model',num2str(model)])); mkdir(fullfile('models',['model',num2str(model)])); end
+    if ~isdir(EXPT.modeldir); mkdir(EXPT.modeldir); end
+    if ~isdir(fullfile(EXPT.modeldir,['model',num2str(model)])); mkdir(fullfile(EXPT.modeldir,['model',num2str(model)])); end
     
     % generic design specification
     def = spm_get_defaults;
@@ -38,7 +38,7 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         job = job0;
         
         % overwrite existing files
-        modeldir = fullfile('models',['model',num2str(model)],['subj',num2str(subj)]);
+        modeldir = fullfile(EXPT.modeldir,['model',num2str(model)],['subj',num2str(subj)]);
         if isdir(modeldir); rmdir(modeldir,'s'); end
         mkdir(modeldir);
         

@@ -13,3 +13,4 @@ function ccnl_mean(EXPT,subjects)
     end
     
     spm_mean(P);
+    movefile('mean.nii',fullfile(EXPT.modeldir,'mean.nii'));
