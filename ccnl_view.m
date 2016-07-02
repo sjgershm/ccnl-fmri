@@ -1,8 +1,9 @@
-function ccnl_view(model,contrast)
+function ccnl_view(EXPT,model,contrast)
     
-    % View group-level T-map. If 'mean.nii' (average normalized structural) exists, will use that as overlay.
+    % View group-level T-map. If 'mean.nii' (average normalized structural)
+    % exists, one will be created for use as an overlay.
     %
-    % USAGE: ccnl_view(model,contrast)
+    % USAGE: ccnl_view(EXPT,model,contrast)
     %
     % Requires bspmview (http://www.bobspunt.com/bspmview/).
     
@@ -15,7 +16,7 @@ function ccnl_view(model,contrast)
     spmT = fullfile(EXPT.modeldir,['model',num2str(model)],sprintf('spmT_%04d.nii',ix));
     struc = fullfile(EXPT.modeldir,'mean.nii');
     if ~exist(struc,'file')
-        bspmview(spmT);
-    else
-        bspmview(spmT,struc);
+        ccnl_mean(EXPT);
     end
+    
+    bspmview(spmT,struc);
