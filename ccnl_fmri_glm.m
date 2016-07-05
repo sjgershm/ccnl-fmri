@@ -45,8 +45,6 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         job.dir{1} = modeldir;
         cd(modeldir);
         S = EXPT.subject(subj);
-        for i = 1:length(S.functional); S.functional{i} = fullfile(S.datadir,S.functional{i}); end
-        S.structural = fullfile(S.datadir,S.structural);
         job.mask{1} = [];
         job.mask{1} = fullfile(S.datadir,'wBrain.nii');
         for i = 1:length(S.functional)
