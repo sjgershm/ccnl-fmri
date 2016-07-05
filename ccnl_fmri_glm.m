@@ -53,7 +53,7 @@ function ccnl_fmri_glm(EXPT,model,subjects)
             multi = EXPT.create_multi(model,subj,i);
             save(fullfile(modeldir,['multi',num2str(i)]),'-struct','multi');
             job.sess(i).hpf = def.stats.fmri.hpf;   % high-pass filter
-            job.sess(i).scans{1} = spm_file(fullfile(S.datadir,S.functional{i}),'prefix','swu');
+            job.sess(i).scans{1} = fullfile(S.datadir,['swu',S.functional{i}]);
             job.sess(i).multi{1} = fullfile(modeldir,['multi',num2str(i)]);
             job.sess(i).cond = struct('name',{},'onset',{},'duration',{},'tmod',{},'pmod',{},'orth',{});
             job.sess(i).regress = [];
