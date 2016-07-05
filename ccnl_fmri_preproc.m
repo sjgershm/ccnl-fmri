@@ -69,10 +69,10 @@ function ccnl_fmri_preproc(EXPT,subjects)
         Vi(4) = spm_vol(vout.channel.biascorr{1});
         f = '(i1 + i2 + i3) .* i4';
         pth = fileparts(Vi(4).fname);
-        Vo = spm_imcalc(Vi,fullfile(pth,'Brain.nii'),f);
+        Vstruc = spm_imcalc(Vi,fullfile(pth,'Brain.nii'),f);
         
         %% Coregister mean functional to skull-stripped bias-corrected structural and apply transformation to other functionals
-        x = spm_coreg(Vo,meanuwr);
+        x = spm_coreg(Vstruc,meanuwr);
         PO = spm_file(S.functional,'prefix','u');
         M  = spm_matrix(x);
         MM = zeros(4,4,numel(PO));
@@ -119,7 +119,7 @@ function ccnl_fmri_preproc(EXPT,subjects)
         job = [];
         job.woptions = def.normalise.write;
         job.woptions.vox = [1 1 1];
-        job.subj.resample{1} = Vo.fname;
+        job.subj.resample{1} = Vstruc.fname;
         job.subj.def{1} = vout.fordef{1};
         spm_run_norm(job);
         
