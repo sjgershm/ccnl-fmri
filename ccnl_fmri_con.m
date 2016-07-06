@@ -7,6 +7,8 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     if nargin < 4; subjects = 1:length(EXPT.subject); end
     cdir = pwd;
     C = [1 -1];
+    spm('defaults','fmri');
+    spm_jobman('initcfg');
     
     %% Construct contrasts
     for subj = subjects
@@ -33,7 +35,6 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.sessrep = 'none';
         end
         
-        save(fullfile(modeldir,'contrasts'),'contrasts');
         spm_jobman('run',matlabbatch);
     end
     
@@ -56,8 +57,22 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     out = spm_run_factorial_design(job);
     load(out.spmmat{1});
     SPM = spm_spm(SPM);
+    
+    % write contrasts and t-maps
+    modeldir = fullfile(EXPT.modeldir,['model',num2str(model)]);
+    
+    matlabbatch = [];
+    matlabbatch{1}.spm.stats.con.spmmat{1} = fullfile(modeldir,'SPM.mat');
+    matlabbatch{1}.spm.stats.con.delete = 1;
     for j = 1:length(contrasts)
-        SPM.xCon = spm_FcUtil('Set',contrasts{j},'T','c',1,SPM.xX.xKXs);
+        convec = zeros(size(SPM.xX.name));
+        ix = strcmp(SPM.xX.name,'mean');
+        convec(ix) = 1;
+        matlabbatch{1}.spm.stats.con.consess{j}.tcon.name = contrasts{j};
+        matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec;
+        matlabbatch{1}.spm.stats.con.consess{j}.tcon.sessrep = 'none';
     end
-    spm_contrasts(SPM);
+    
+    spm_jobman('run',matlabbatch);
+    
     cd(cdir);
