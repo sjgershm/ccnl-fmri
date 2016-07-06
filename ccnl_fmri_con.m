@@ -42,8 +42,9 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     %% Group-level analysis
     modeldir = fullfile(EXPT.modeldir,['model',num2str(model)]);
     save(fullfile(modeldir,'contrasts'),'contrasts');
+    cd(modeldir)
     job.dir{1} = modeldir;
-    job.multi_cov = []; job.cov = []; job.globalc.g_omit = 1; 
+    job.multi_cov = []; job.cov = []; job.globalc.g_omit = 1;
     job.globalm.glonorm = 1; job.globalm.gmsca.gmsca_no = 1;
     job.masking.tm.tm_none = 1; job.masking.em{1} = [];
     for j = 1:length(contrasts)
@@ -54,5 +55,9 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     end
     out = spm_run_factorial_design(job);
     load(out.spmmat{1});
-    spm_spm(SPM);
+    SPM = spm_spm(SPM);
+    for j = 1:length(contrasts)
+        SPM.xCon = spm_FcUtil('Set',contrasts{j},'T','c',1,SPM.xX.xKXs);
+    end
+    spm_contrasts(SPM);
     cd(cdir);
