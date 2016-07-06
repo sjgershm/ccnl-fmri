@@ -43,6 +43,7 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     %% Group-level analysis
     modeldir = fullfile(EXPT.modeldir,['model',num2str(model)]);
     save(fullfile(modeldir,'contrasts'),'contrasts');
+    if exist(fullfile(modeldir,'SPM.mat'),'file'); delete(fullfile(modeldir,'SPM.mat')); end
     cd(modeldir)
     job.dir{1} = modeldir;
     job.multi_cov = []; job.cov = []; job.globalc.g_omit = 1;

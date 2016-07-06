@@ -11,5 +11,5 @@ function ccnl_mean(EXPT,subjects)
         P{subj} = fullfile(EXPT.subject(i).datadir,'wBrain.nii');
     end
     
-    spm_mean(P);
+    spm_mean(char(P));
     movefile('mean.nii',fullfile(EXPT.modeldir,'mean.nii'));
