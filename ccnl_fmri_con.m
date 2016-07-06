@@ -59,8 +59,6 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     SPM = spm_spm(SPM);
     
     % write contrasts and t-maps
-    modeldir = fullfile(EXPT.modeldir,['model',num2str(model)]);
-    
     matlabbatch = [];
     matlabbatch{1}.spm.stats.con.spmmat{1} = fullfile(modeldir,'SPM.mat');
     matlabbatch{1}.spm.stats.con.delete = 1;
