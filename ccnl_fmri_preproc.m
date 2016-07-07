@@ -34,10 +34,9 @@ function ccnl_fmri_preproc(EXPT,subjects)
         
         %% Unwarp functional images
         for i = 1:length(S.functional)
-            ds = spm_uw_estimate(S.functional{i}); % estimate deformation field
-            spm_uw_apply(ds);           % reslice unwarped functionals (u* prefix)
+            ds = spm_uw_estimate(S.functional{i});  % estimate deformation field
+            spm_uw_apply(ds);                       % reslice unwarped functionals (u* prefix)
         end
-        meanuwr = spm_file(S.functional{1},'prefix','meanu','number','');
         
         %% Segment structural image
         job = [];
@@ -68,47 +67,27 @@ function ccnl_fmri_preproc(EXPT,subjects)
         end
         Vi(4) = spm_vol(vout.channel.biascorr{1});
         f = '(i1 + i2 + i3) .* i4';
-        pth = fileparts(Vi(4).fname);
-        Vstruc = spm_imcalc(Vi,fullfile(pth,'Brain.nii'),f);
+        Vstruc = spm_imcalc(Vi,fullfile(S.datadir,'Brain.nii'),f);
         
-        %% Coregister mean functional to skull-stripped bias-corrected structural and apply transformation to other functionals
-        x = spm_coreg(Vstruc,meanuwr);
-        PO = spm_file(S.functional,'prefix','u');
-        M  = spm_matrix(x);
-        MM = zeros(4,4,numel(PO));
-        for j=1:numel(PO)
-            MM(:,:,j) = spm_get_space(PO{j});
-        end
-        for j=1:numel(PO)
-            spm_get_space(PO{j}, M\MM(:,:,j));
-        end
+        %% Coregister structural and mean functional
+        disp('Coregistering structural and mean functional...')
+        job = [];
+        job.eoptions = def.coreg.estimate;
+        job.ref{1} = Vstruc.fname;
+        job.source{1} = spm_file(S.functional{1},'prefix','meanu','number','');
+        job.other = spm_file(S.functional,'prefix','u');
+        out = spm_run_coreg(job);
         
         %% Normalize functionals using forward deformation parameters from segmentation
+        disp('Normalizing functionals...')
         job = [];
         job.woptions = def.normalise.write;
-        job.woptions.vox = [2.2 2.2 2.2];
-        job.subj.resample = PO;
+        job.subj.resample = out.cfiles;
         job.subj.def{1} = vout.fordef{1};
         out = spm_run_norm(job);
         
-        %% Write mean image
-        Vi = spm_vol(spm_file(S.functional{1},'prefix','wu'));
-        Vo = struct('fname',    fullfile(pth,['mean' spm_file_ext]),...
-            'dim',      Vi(1).dim(1:3),...
-            'dt',       [spm_type('int16') spm_platform('bigend')],...
-            'mat',      Vi(1).mat,...
-            'pinfo',    [1 0 0]',...
-            'descrip',  'spm - mean image');
-        n  = numel(Vi);
-        for i=1:n
-            Vi(i).pinfo(1:2,:) = Vi(i).pinfo(1:2,:)/n;
-        end
-        
-        Vo            = spm_create_vol(Vo);
-        Vo.pinfo(1,1) = spm_add(Vi,Vo);
-        Vo            = spm_create_vol(Vo);
-        
         %% Smooth normalized functionals
+        disp('Smoothing functionals...')
         job = def.smooth;
         job.data = out.files;
         job.dtype = 0;
@@ -116,11 +95,16 @@ function ccnl_fmri_preproc(EXPT,subjects)
         spm_run_smooth(job);
         
         %% Normalize skull-stripped bias-corrected structural
+        disp('Normalizing structural...')
         job = [];
         job.woptions = def.normalise.write;
         job.woptions.vox = [1 1 1];
         job.subj.resample{1} = Vstruc.fname;
         job.subj.def{1} = vout.fordef{1};
         spm_run_norm(job);
+        
+        %% Write mean functional image (only used for checking coregistration)
+        spm_mean(spm_file(S.functional{1},'prefix','wu'));
+        movefile('mean.nii',fullfile(S.datadir,'mean.nii'));
         
     end
