@@ -26,12 +26,12 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
                 con{c} = strtrim(con{c});
                 for i = 1:length(SPM.xX.name)
                     if ~isempty(strfind(SPM.xX.name{i},[con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},[con{c},'^']))
-                        convec(i) = C(c);
+                        convec(j,i) = C(c);
                     end
                 end
             end
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.name = contrasts{j};
-            matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec;
+            matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec(j,:);
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.sessrep = 'none';
         end
         
@@ -42,7 +42,7 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     
     %% Group-level analysis
     modeldir = fullfile(EXPT.modeldir,['model',num2str(model)]);
-    save(fullfile(modeldir,'contrasts'),'contrasts');
+    save(fullfile(modeldir,'contrasts'),'contrasts','convec');
     if exist(fullfile(modeldir,'SPM.mat'),'file'); delete(fullfile(modeldir,'SPM.mat')); end
     cd(modeldir)
     job.dir{1} = modeldir;
