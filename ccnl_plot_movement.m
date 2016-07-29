@@ -13,6 +13,7 @@ function ccnl_plot_movement(EXPT,subj)
         nscan(i) = length(p);
         P = [P; p];
     end
+    nscan = cumsum(nscan);
     
     fg=spm_figure;
     if length(P)<2, return; end;
