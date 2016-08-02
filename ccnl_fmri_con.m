@@ -71,9 +71,9 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
         convec = zeros(size(SPM.xX.name));
         ix = strcmp(SPM.xX.name,'mean');
         convec(ix) = 1;
-        matlabbatch{1}.spm.stats.con.consess{j}.tcon.name = contrasts{j};
-        matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec;
-        matlabbatch{1}.spm.stats.con.consess{j}.tcon.sessrep = 'none';
+        matlabbatch{1}.spm.stats.con.consess{1}.tcon.name = contrasts{j};
+        matlabbatch{1}.spm.stats.con.consess{1}.tcon.convec = convec;
+        matlabbatch{1}.spm.stats.con.consess{1}.tcon.sessrep = 'none';
         
         spm_jobman('run',matlabbatch);
         
