@@ -13,7 +13,7 @@ function ccnl_view(EXPT,model,contrast)
     if isempty(ix)
         error('Contrast not found');
     end
-    spmT = fullfile(EXPT.modeldir,['model',num2str(model)],['con',num2str(ix)],sprintf('spmT_%04d.nii',ix));
+    spmT = fullfile(EXPT.modeldir,['model',num2str(model)],['con',num2str(ix)],'spmT_0001.nii');
     struc = fullfile(EXPT.modeldir,'mean.nii');
     if ~exist(struc,'file')
         ccnl_mean(EXPT);
