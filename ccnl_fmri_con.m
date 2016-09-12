@@ -9,6 +9,7 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     C = [1 -1];
     spm('defaults','fmri');
     spm_jobman('initcfg');
+    if isstr(contrasts); contrasts = {contrasts}; end
     
     %% Construct contrasts
     for subj = subjects
@@ -19,9 +20,9 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
         matlabbatch{1}.spm.stats.con.spmmat{1} = fullfile(modeldir,'SPM.mat');
         matlabbatch{1}.spm.stats.con.delete = 1;
         
+        convec = zeros(size(SPM.xX.name));
         for j = 1:length(contrasts)
             con = regexp(contrasts{j},'-','split');
-            convec = zeros(size(SPM.xX.name));
             for c = 1:length(con)
                 con{c} = strtrim(con{c});
                 for i = 1:length(SPM.xX.name)
@@ -51,9 +52,22 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
         mkdir(modeldir);
         cd(modeldir)
         job.dir{1} = modeldir;
-        job.multi_cov = []; job.cov = []; job.globalc.g_omit = 1;
+        job.multi_cov = []; job.globalc.g_omit = 1;
         job.globalm.glonorm = 1; job.globalm.gmsca.gmsca_no = 1;
         job.masking.tm.tm_none = 1; job.masking.em{1} = [];
+        
+        % covariates - not working yet!!
+        if isfield(EXPT,'cov')
+            if ~isfield(EXPT.cov,'iCC')
+                for i = 1:length(EXPT.cov); EXPT.cov(i).iCC = 1; end
+            end
+            if ~isfield(EXPT.cov,'iCFI')
+                for i = 1:length(EXPT.cov); EXPT.cov(i).iCFI = 1; end
+            end
+            job.cov = EXPT.cov;
+        else
+            job.cov = [];
+        end
         
         con = sprintf('con_%04d.nii',j);
         for s = 1:length(subjects)
@@ -68,12 +82,12 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
         matlabbatch = [];
         matlabbatch{1}.spm.stats.con.spmmat{1} = fullfile(modeldir,'SPM.mat');
         matlabbatch{1}.spm.stats.con.delete = 1;
-        convec = zeros(size(SPM.xX.name));
-        ix = strcmp(SPM.xX.name,'mean');
-        convec(ix) = 1;
-        matlabbatch{1}.spm.stats.con.consess{1}.tcon.name = contrasts{j};
-        matlabbatch{1}.spm.stats.con.consess{1}.tcon.convec = convec;
-        matlabbatch{1}.spm.stats.con.consess{1}.tcon.sessrep = 'none';
+        for i = 1:length(SPM.xX.name)
+            convec = zeros(size(SPM.xX.name)); convec(i) = 1;
+            matlabbatch{1}.spm.stats.con.consess{1}.tcon.name = [contrasts{j},', ',SPM.xX.name{i}];
+            matlabbatch{1}.spm.stats.con.consess{1}.tcon.convec = convec';
+            matlabbatch{1}.spm.stats.con.consess{1}.tcon.sessrep = 'none';
+        end
         
         spm_jobman('run',matlabbatch);
         
