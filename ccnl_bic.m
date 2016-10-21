@@ -22,7 +22,7 @@ function bic = ccnl_bic(EXPT,model,mask,subjects)
     if ischar(mask)
         V = spm_vol(mask);
         Y = spm_read_vols(V);
-        mask = Y~=0 && ~isnan(Y);
+        mask = Y~=0 & ~isnan(Y);
     end
     
     bic = zeros(length(subjects),1);
