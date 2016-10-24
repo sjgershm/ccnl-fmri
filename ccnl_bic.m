@@ -33,5 +33,5 @@ function bic = ccnl_bic(EXPT,model,mask,subjects)
         [N,K] = size(SPM.xX.X); % number of datapoints and parameters
         V = spm_vol(fullfile(modeldir,'ResMS.nii'));    % residual variance image
         Y = spm_read_vols(V);
-        bic(s) = N*sum(log(Y(mask))) + K*log(N);
+        bic(s) = N*nansum(log(Y(mask))) + K*log(N);
     end
