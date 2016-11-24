@@ -21,7 +21,7 @@ function ccnl_fmri_glm(EXPT,model,subjects)
     job.fact = [];
     job.cvi = def.stats.fmri.cvi;
     job.global = 'None';
-    job.mthresh = def.mask.thresh;
+    job.mthresh = 0.4;
     
     % hrf specification; use canonical hrf by default
     if isfield(EXPT,'bases')
