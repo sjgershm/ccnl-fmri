@@ -1,6 +1,7 @@
 function ccnl_check_mask(EXPT,model,contrast)
     
-    % Check co-registration of group-level structural and mask images.
+    % Check group-level mask image against group-level structural
+    % to ensure there are no "missing" voxels.
     % If 'mean.nii' (average normalized structural) doesn't exist,
     % one will be created.
     %
