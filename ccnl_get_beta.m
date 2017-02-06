@@ -2,7 +2,7 @@ function beta = ccnl_get_beta(EXPT,model,regname,mask,subjects)
     
     % Extract beta coefficients from a mask.
     %
-    % USAGE: bic = ccnl_bic(EXPT,model,regname,mask,[subjects])
+    % USAGE: bic = ccnl_get_beta(EXPT,model,regname,mask,[subjects])
     %
     % INPUTS:
     %   EXPT - experiment structure
