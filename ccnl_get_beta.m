@@ -1,13 +1,13 @@
-function beta = ccnl_get_beta(EXPT,model,regname,mask,subjects)
+function beta = ccnl_get_beta(EXPT,model,regressor,mask,subjects)
     
     % Extract beta coefficients from a mask.
     %
-    % USAGE: bic = ccnl_get_beta(EXPT,model,regname,mask,[subjects])
+    % USAGE: beta = ccnl_get_beta(EXPT,model,regressor,mask,[subjects])
     %
     % INPUTS:
     %   EXPT - experiment structure
     %   model - model number
-    %   regname - regressor name
+    %   regressor - regressor name or regressor index
     %   mask - a mask image name (e.g., 'mask.nii'), a set of voxel
     %          indices, or a binary vector
     %   subjects (optional) - which subjects to analyze (default all subjects)
@@ -25,16 +25,20 @@ function beta = ccnl_get_beta(EXPT,model,regname,mask,subjects)
         Ymask = spm_read_vols(Vmask);
         mask = Ymask~=0 & ~isnan(Ymask);
     end
-    
+
+    if ischar(regressor)
+        regressor = strtrim(regressor);
+    end
+
     for s = 1:length(subjects)
         subj = subjects(s);
         modeldir = fullfile(EXPT.modeldir,['model',num2str(model)],['subj',num2str(subj)]);
         load(fullfile(modeldir,'SPM.mat'));
-        
-        regname = strtrim(regname);
+       
         n = 0; clear y
         for i = 1:length(SPM.xX.name)
-            if ~isempty(strfind(SPM.xX.name{i},[regname,'*'])) || ~isempty(strfind(SPM.xX.name{i},[regname,'^']))
+            if ischar(regressor) && (~isempty(strfind(SPM.xX.name{i},[regressor,'*'])) || ~isempty(strfind(SPM.xX.name{i},[regressor,'^']))) ...
+               || ~ischar(regressor) && i == regressor
                 n = n + 1;
                 V = spm_vol(fullfile(modeldir,sprintf('beta_%04d.nii',i)));    % residual variance image
                 Y = spm_read_vols(V);
@@ -51,6 +55,6 @@ function beta = ccnl_get_beta(EXPT,model,regname,mask,subjects)
             end
         end
         
-        beta(s,:) = nanmean(y);
+        beta(s,:) = nanmean(y, 1);
         
     end
