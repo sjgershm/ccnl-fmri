@@ -26,7 +26,7 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
             for c = 1:length(con)
                 con{c} = strtrim(con{c});
                 for i = 1:length(SPM.xX.name)
-                    if ~isempty(strfind(SPM.xX.name{i},[con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},[con{c},'^']))
+                    if ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
                         convec(j,i) = C(c);
                     end
                 end
@@ -35,10 +35,10 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec(j,:);
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.sessrep = 'none';
         end
-        
+
         spm_jobman('run',matlabbatch);
     end
-    
+
     cd(cdir);
     
     %% save contrasts
