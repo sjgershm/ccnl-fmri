@@ -25,11 +25,14 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
             con = regexp(contrasts{j},'-','split');
             for c = 1:length(con)
                 con{c} = strtrim(con{c});
+                found = false;
                 for i = 1:length(SPM.xX.name)
-                    if ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
+                    if isequal(strfind(SPM.xX.name{i},[con{c},'*']), 1) || ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
                         convec(j,i) = C(c);
+                        found = true;
                     end
                 end
+                assert(found, ['Cannot find regressor ', con{c}]);
             end
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.name = contrasts{j};
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec(j,:);
