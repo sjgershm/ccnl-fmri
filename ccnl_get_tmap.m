@@ -37,11 +37,11 @@ function tmap = ccnl_get_tmap(EXPT,model,regressor,mask,subjects)
         subj = subjects(s);
         modeldir = fullfile(EXPT.modeldir,['model',num2str(model)],['subj',num2str(subj)]);
 
-        t = get_beta_or_tmap_helper(regressor, modeldir, mask, contrasts, 'spmT');
+        t = get_beta_or_tmap_helper(regressor, modeldir, Vmask, mask, contrasts, 'spmT');
     
         if size(t, 1) > 1
             load(fullfile(modeldir,'SPM.mat'));
-            b = get_beta_or_tmap_helper(regressor, modeldir, mask, SPM.xX.name, 'beta');
+            b = get_beta_or_tmap_helper(regressor, modeldir, Vmask, mask, SPM.xX.name, 'beta');
             assert(isequal(size(b), size(t)), 'Should have 1 t-map only or exactly 1 t-map per regressor');
 
             se = b ./ t;
@@ -58,7 +58,7 @@ end
 
 % helper function
 %
-function y = get_beta_or_tmap_helper(regressor, modeldir, mask, names, prefix)
+function y = get_beta_or_tmap_helper(regressor, modeldir, Vmask, mask, names, prefix)
     n = 0;
     for i = 1:length(names)
         if ischar(regressor) && (~isempty(strfind(names{i},[regressor,'*'])) || ~isempty(strfind(names{i},[regressor,'^'])) || endsWith(names{i},regressor)) ...
@@ -66,7 +66,7 @@ function y = get_beta_or_tmap_helper(regressor, modeldir, mask, names, prefix)
             n = n + 1;
             V = spm_vol(fullfile(modeldir,sprintf('%s_%04d.nii',prefix,i)));    % residual variance or t-statistic image
             Y = spm_read_vols(V);
-            
+           
             if all(size(Y) == size(mask))
                 y(n,:) = Y(mask);
             else
