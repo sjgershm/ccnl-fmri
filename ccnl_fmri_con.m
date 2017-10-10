@@ -26,23 +26,28 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
             N = [0 0];
             for c = 1:length(con)
                 con{c} = strtrim(con{c});
+                %found = false;
                 for i = 1:length(SPM.xX.name)
-                    if ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
+                    if isequal(strfind(SPM.xX.name{i},[con{c},'*']), 1) || ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
                         convec(j,i) = C(c);
                         N(c) = N(c) + 1;
                     end
                 end
                 ix = convec(j,:)==C(c);
                 convec(j,ix) = convec(j,ix)/N(c);
+                %found = true;
+                %end
+                %end
+                %assert(found, ['Cannot find regressor ', con{c}]);
             end
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.name = contrasts{j};
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec(j,:);
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.sessrep = 'none';
         end
-
+        
         spm_jobman('run',matlabbatch);
     end
-
+    
     cd(cdir);
     
     %% save contrasts
