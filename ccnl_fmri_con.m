@@ -23,13 +23,17 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
         convec = zeros(size(SPM.xX.name));
         for j = 1:length(contrasts)
             con = regexp(contrasts{j},'-','split');
+            N = [0 0];
             for c = 1:length(con)
                 con{c} = strtrim(con{c});
                 for i = 1:length(SPM.xX.name)
                     if ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
                         convec(j,i) = C(c);
+                        N(c) = N(c) + 1;
                     end
                 end
+                ix = convec(j,:)==C(c);
+                convec(j,ix) = convec(j,ix)/N(c);
             end
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.name = contrasts{j};
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec(j,:);
