@@ -1,14 +1,15 @@
-function ccnl_fmri_preproc(EXPT,subjects)
+function ccnl_fmri_preproc(EXPT,subjects,def)
     
     % Preprocess fMRI data. This function does the following: (1)
     % realignment and unwarping, (2) segmentation, (3) coregistration of functionals to
     % structural, (4) normalization, (5) smoothing.
     %
-    % USAGE: fmri_preproc(EXPT,subjects)
+    % USAGE: fmri_preproc(EXPT,[subjects],[def])
     %
     % INPUTS:
     %   EXPT - experiment structure
     %   subjects (optional) - vector of subject numbers (default: all subjects)
+    %   def (optional) - parameter defaults (def = spm_get_defaults)
     %
     % OUTPUTS:
     %   Realignment and coregistration induce changes in the headers of the nifti files.
@@ -19,7 +20,7 @@ function ccnl_fmri_preproc(EXPT,subjects)
     % Sam Gershman, June 2016
     
     % Setup
-    def = spm_get_defaults; % SPM defaults
+    if nargin < 3; def = spm_get_defaults; end % SPM defaults
     if nargin < 2; subjects = 1:length(EXPT.subject); end
     
     % Loop over subjects
