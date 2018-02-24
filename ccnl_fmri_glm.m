@@ -43,7 +43,6 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         mkdir(modeldir);
         
         job.dir{1} = modeldir;
-        cd(modeldir);
         S = EXPT.subject(subj);
         job.mask{1} = fullfile(S.datadir,'wBrain.nii');
         for i = 1:length(S.functional)
@@ -57,9 +56,11 @@ function ccnl_fmri_glm(EXPT,model,subjects)
             job.sess(i).multi_reg{1} = spm_file(fullfile(S.datadir,S.functional{i}),'prefix','rp_','ext','txt');    % motion regressors from realignment
         end
         
+        cd(modeldir);
+
         job = spm_run_fmri_spec(job);
         load(job.spmmat{1});
         spm_spm(SPM);
-        
+
         cd(cdir);
     end
