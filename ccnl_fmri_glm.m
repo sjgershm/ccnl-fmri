@@ -1,12 +1,15 @@
-function ccnl_fmri_glm(EXPT,model,subjects)
+function ccnl_fmri_glm(EXPT,model,subjects,fake)
     
     % Estimate subject-level GLM.
+    % If fake = true, only creates the SPM.mat files, without actually 
+    % running the GLM. Use for quick sanity checks
     %
     % USAGE: ccnl_fmri_glm(EXPT,model,[subjects])
     
     cdir = pwd;
     if nargin < 3; subjects = 1:length(EXPT.subject); end
-    
+    if nargin < 4; fake = false; end
+
     % create models folder if none exists
     if ~isdir(EXPT.modeldir); mkdir(EXPT.modeldir); end
     if ~isdir(fullfile(EXPT.modeldir,['model',num2str(model)])); mkdir(fullfile(EXPT.modeldir,['model',num2str(model)])); end
@@ -59,8 +62,11 @@ function ccnl_fmri_glm(EXPT,model,subjects)
         cd(modeldir);
 
         job = spm_run_fmri_spec(job);
-        load(job.spmmat{1});
-        spm_spm(SPM);
+
+        if ~fake
+            load(job.spmmat{1});
+            spm_spm(SPM);
+        end
 
         cd(cdir);
     end
