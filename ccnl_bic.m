@@ -36,8 +36,8 @@ for s = 1:length(subjects)
     
     if all(size(Y) == size(mask))
         bic(s) = N*nansum(log(Y(mask))) + K*log(N);
+       
     else
-        disp('here')
         [mask_cor1, mask_cor2, mask_cor3] = ind2sub(size(mask),find(mask==1));
         res_cor = mni2cor(cor2mni([mask_cor1 mask_cor2 mask_cor3], Vmask.mat),V.mat);
         res_inds = sub2ind(size(Y),res_cor(:,1),res_cor(:,2),res_cor(:,3));
