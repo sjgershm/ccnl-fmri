@@ -33,7 +33,7 @@ function beta = ccnl_get_beta(EXPT,model,regressor,mask,subjects)
         if ndims(mask) == 3
             type = 'mask';
         elseif ndims(mask) == 2
-            if size(mask,1) == 3
+            if size(mask,2) == 3
                 type = 'mni';
             elseif size(mask,1) == 1 || size(mask,2) == 1
                 type = 'inds_or_binary';
