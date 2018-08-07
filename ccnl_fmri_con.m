@@ -6,7 +6,7 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     
     if nargin < 4; subjects = 1:length(EXPT.subject); end
     cdir = pwd;
-    C = [1 -1];
+    C = containers.Map({'+', '-'}, [1, -1]);
     spm('defaults','fmri');
     spm_jobman('initcfg');
     if isstr(contrasts); contrasts = {contrasts}; end
@@ -22,24 +22,32 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
         
         convec = zeros(size(SPM.xX.name));
         for j = 1:length(contrasts)
-            con = regexp(contrasts{j},'-','split');
-            N = [0 0];
+            con = regexp(contrasts{j},'[-+]','split');
+            sgn = regexp(contrasts{j},'[-+]','match');
+            sgn = [{'+'}, sgn];
+            contrasts{j}
+            con
+            sgn
+            N = zeros(1,length(con));
             for c = 1:length(con)
                 con{c} = strtrim(con{c});
+                sgn{c} = strtrim(sgn{c});
                 %found = false;
+                ix = logical(zeros(1,length(SPM.xX.name)));
                 for i = 1:length(SPM.xX.name)
                     if isequal(strfind(SPM.xX.name{i},[con{c},'*']), 1) || ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
-                        convec(j,i) = C(c);
+                        convec(j,i) = C(sgn{c});
                         N(c) = N(c) + 1;
+                        ix(i) = 1;
                     end
                 end
-                ix = convec(j,:)==C(c);
                 convec(j,ix) = convec(j,ix)/N(c);
                 %found = true;
                 %end
                 %end
                 %assert(found, ['Cannot find regressor ', con{c}]);
             end
+            convec
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.name = contrasts{j};
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.convec = convec(j,:);
             matlabbatch{1}.spm.stats.con.consess{j}.tcon.sessrep = 'none';
