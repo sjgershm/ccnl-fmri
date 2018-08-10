@@ -18,6 +18,7 @@ function beta = ccnl_get_beta(EXPT,model,regressor,mask,subjects)
     %   beta - [nSubjects x nVoxels] beta coefficients
     %
     % Sam Gershman, Nov 2016
+    % Momchil Tomov, Aug 2018
     
     if nargin < 4; subjects = 1:length(EXPT.subject); end
 

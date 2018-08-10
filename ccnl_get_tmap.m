@@ -16,7 +16,7 @@ function tmap = ccnl_get_tmap(EXPT,model,regressor,mask,subjects)
     % OUTPUTS:
     %   tmap - [nSubjects x nVoxels] t-statistics
     %
-    % Momchil Tomov, Jul 2017
+    % Momchil Tomov, Aug 2018
     
     if nargin < 4; subjects = 1:length(EXPT.subject); end
    
