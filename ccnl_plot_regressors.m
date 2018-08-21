@@ -2,7 +2,7 @@ function ccnl_plot_regressors(EXPT, glmodel, subj, run)
 
 % Plot the regressors for a given glmodel, subject & run.
 % Requires the SPM structure to have been generated i.e. the single-subject
-% GLM should have been run.
+% GLM should have been run (ccnl_fmri_glm).
 %
 % USAGE:
 % ccnl_plot_regressors(EXPT, glmodel, subj, run)
@@ -96,6 +96,7 @@ for i = cols
             end
         end
     end
+
     
     % plot regressor convolved with HRF
     %
