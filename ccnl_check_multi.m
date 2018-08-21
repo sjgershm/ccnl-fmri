@@ -62,7 +62,7 @@ for glmodel = glmodels
             % check for dependent columns
             [R, jb] = rref(X);
             if numel(jb) < size(X,2)
-                disp(['Found co-linear regressors for glmodel ', num2str(glmodel), ', subj ', num2str(subj), ', run ', num2str(run), ':']);
+                disp(['Found linearly dependent regressors for glmodel ', num2str(glmodel), ', subj ', num2str(subj), ', run ', num2str(run), ':']);
 
                 % print dependent columns
                 c = logical(ones(1,size(X,2)));
@@ -82,6 +82,8 @@ for glmodel = glmodels
                     end
                     disp(s);
                 end
+
+                assert(false);
             end
         end
     end

@@ -5,9 +5,6 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
     % Notice that this does not rely on the SPM structure (unlike ccnl_plot_regressors).
     %
     % USAGE:
-    %   ccnl_check_multi(EXPT, glmodels)
-    %   ccnl_check_multi(EXPT, glmodels, subjs)
-    %   ccnl_check_multi(EXPT, glmodels, subjs, runs)
     %   ccnl_get_design(EXPT, glmodel, subj, run)
     %
     % INPUT:
