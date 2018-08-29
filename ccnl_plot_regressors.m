@@ -28,7 +28,7 @@ load(fullfile(modeldir,'SPM.mat'));
 
 TR = EXPT.TR;
 sess_prefix = ['Sn(', num2str(run), ')'];
-trs = 1 : TR : TR*length(SPM.Sess(run).row); % or start at 0? how does slice timing interpolation work in SPM?
+trs = TR/2 : TR : TR*length(SPM.Sess(run).row); % or start at 0? how does slice timing interpolation work in SPM?
 
 
 figure;

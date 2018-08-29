@@ -14,8 +14,8 @@ function y = get_beta_or_tmap_helper(regressor, modeldir, Vmask, mask, names, ma
                 case 'inds_or_binary' % a list of voxel indices or a binary vector in NATIVE space
                     y(n,:) = Y(mask);
 
-                case 'mni' % a list of MNI (!) coordinates
-                    cor = mni2cor(mask, V.mat);
+                case 'cor' % a list of coordinates
+                    cor = mask;
                     inds = sub2ind(size(Y),cor(:,1),cor(:,2),cor(:,3));
                     y(n,:) = Y(inds);
 

@@ -9,8 +9,11 @@ function tmap = ccnl_get_tmap(EXPT,model,regressor,mask,subjects)
     %   EXPT - experiment structure
     %   model - model number
     %   regressor - regressor name or regressor index
-    %   mask - a mask image name (e.g., 'mask.nii'), a set of voxel
-    %          indices, or a binary vector
+    %   mask - a mask image name (e.g., 'mask.nii') in MNI or native space,
+    %          a list of voxel indices in native space,
+    %          a binary vector/mask in native space,
+    %          or a list of voxels in native coordinates as a [N x 3] matrix
+    %          (use mni2cor first if coordinates are in MNI space)
     %   subjects (optional) - which subjects to analyze (default all subjects)
     %
     % OUTPUTS:

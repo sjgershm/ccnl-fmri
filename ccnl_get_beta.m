@@ -11,7 +11,8 @@ function beta = ccnl_get_beta(EXPT,model,regressor,mask,subjects)
     %   mask - a mask image name (e.g., 'mask.nii') in MNI or native space,
     %          a list of voxel indices in native space,
     %          a binary vector/mask in native space,
-    %          or a list of voxels in MNI coordinates as a [N x 3] matrix
+    %          or a list of voxels in native coordinates as a [N x 3] matrix
+    %          (use mni2cor first if coordinates are in MNI space)
     %   subjects (optional) - which subjects to analyze (default all subjects)
     %
     % OUTPUTS:

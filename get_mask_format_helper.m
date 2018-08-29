@@ -17,7 +17,7 @@ function [mask_format, mask, Vmask] = get_mask_format_helper(mask)
             mask_format = 'mask';
         elseif ndims(mask) == 2
             if size(mask,2) == 3
-                mask_format = 'mni';
+                mask_format = 'cor';
             elseif size(mask,1) == 1 || size(mask,2) == 1
                 mask_format = 'inds_or_binary';
             end

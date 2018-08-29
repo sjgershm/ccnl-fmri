@@ -11,7 +11,8 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
     %   mask - a mask image name (e.g., 'mask.nii') in MNI or native space,
     %          a list of voxel indices in native space,
     %          a binary vector/mask in native space,
-    %          or a list of voxels in MNI coordinates as a [N x 3] matrix
+    %          or a list of voxels in native coordinates as a [N x 3] matrix
+    %          (use mni2cor first if coordinates are in MNI space)
     %   subjects (optional) - which subjects to analyze (default all subjects)
     %
     % OUTPUTS:
@@ -36,9 +37,8 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         % extract voxel activations
         nScans = length(SPM.xY.VY); % # of TRs
         for j=1:nScans
-            if mask_format == 'mni'
-                cor = mni2cor(mask, SPM.xY.VY(j).mat);
-                Y(j,:) = spm_data_read(SPM.xY.VY(j), 'xyz', cor');
+            if mask_format == 'cor'
+                Y(j,:) = spm_data_read(SPM.xY.VY(j), 'xyz', mask');
             else
                 Y(j,:) = spm_data_read(SPM.xY.VY(j), mask);
             end
@@ -53,9 +53,8 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         % sanity check
         ResSS = sum(res.^2); %-Residual SSQ
         V = spm_vol(fullfile(modeldir,'ResMS.nii'));
-        if mask_format == 'mni'
-            cor = mni2cor(mask, V.mat);
-            ResMS = spm_data_read(V, 'xyz', cor');
+        if mask_format == 'cor'
+            ResMS = spm_data_read(V, 'xyz', mask');
         else
             ResMS = spm_data_read(V, mask);
         end
