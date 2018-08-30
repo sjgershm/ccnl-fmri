@@ -2,6 +2,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
     
     % Extract residuals coefficients from a mask.
     % Caution: don't use for too many voxels
+    % TODO does NOT work when subjects have different # of runs ... neither does ccnl_get_beta and ccnl_get_tmap
     %
     % USAGE: residuals = ccnl_get_residuals(EXPT,model,mask,[subjects])
     %
@@ -25,7 +26,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
     % load mask
     [mask_format, mask, Vmask] = get_mask_format_helper(mask);
     % convert logicals to indices
-    if mask_format == 'mask' || islogical(mask)
+    if strcmp(mask_format, 'mask') || islogical(mask)
         mask = find(mask);
     end
 
@@ -37,7 +38,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         % extract voxel activations
         nScans = length(SPM.xY.VY); % # of TRs
         for j=1:nScans
-            if mask_format == 'cor'
+            if strcmp(mask_format, 'cor')
                 Y(j,:) = spm_data_read(SPM.xY.VY(j), 'xyz', mask');
             else
                 Y(j,:) = spm_data_read(SPM.xY.VY(j), mask);
@@ -53,14 +54,14 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         % sanity check
         ResSS = sum(res.^2); %-Residual SSQ
         V = spm_vol(fullfile(modeldir,'ResMS.nii'));
-        if mask_format == 'cor'
+        if strcmp(mask_format, 'cor')
             ResMS = spm_data_read(V, 'xyz', mask');
         else
             ResMS = spm_data_read(V, mask);
         end
-        assert(immse(ResSS / SPM.xX.trRV, ResMS) < 1e-9, ['Computed residuals don''t match ResMS.nii for subject', num2str(s)]);  % ResMS = ResSS scaled by tr(RV)
+        assert(immse(ResSS / SPM.xX.trRV, ResMS) < 1e-9, ['Computed residuals don''t match ResMS.nii for subject', num2str(subj)]);  % ResMS = ResSS scaled by tr(RV)
 
         residuals(:,:,s) = res;
 
-        fprintf('Computed residuals for subject %d\n', s);
+        fprintf('Computed residuals for subject %d\n', subj);
     end
