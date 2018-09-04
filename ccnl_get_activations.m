@@ -1,9 +1,9 @@
-function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
+function activations = ccnl_get_activations(EXPT,model,mask,subjects)
     
-    % Extract residuals coefficients from a mask.
+    % Extract activation coefficients from a mask.
     % Caution: don't use for too many voxels
     %
-    % USAGE: residuals = ccnl_get_residuals(EXPT,model,mask,[subjects])
+    % USAGE: activations = ccnl_get_activations(EXPT,model,mask,[subjects])
     %
     % INPUTS:
     %   EXPT - experiment structure
@@ -16,7 +16,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
     %   subjects (optional) - which subjects to analyze (default all subjects)
     %
     % OUTPUTS:
-    %   residuals - [nScans x nVoxels x nSubjects] residuals
+    %   activations - [nScans x nVoxels x nSubjects] activations
     %
     % Momchil Tomov, Aug 2018
     
@@ -47,20 +47,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         %-Whiten/Weight data and remove filter confounds
         KWY = spm_filter(SPM.xX.K,SPM.xX.W*Y);
 
-        % extract residuals
-        res = spm_sp('r',SPM.xX.xKXs,KWY);
+        activations(:,:,s) = KWY;
 
-        % sanity check
-        ResSS = sum(res.^2); %-Residual SSQ
-        V = spm_vol(fullfile(modeldir,'ResMS.nii'));
-        if strcmp(mask_format, 'cor')
-            ResMS = spm_data_read(V, 'xyz', mask');
-        else
-            ResMS = spm_data_read(V, mask);
-        end
-        assert(immse(ResSS / SPM.xX.trRV, ResMS) < 1e-9, ['Computed residuals don''t match ResMS.nii for subject', num2str(subj)]);  % ResMS = ResSS scaled by tr(RV)
-
-        residuals(:,:,s) = res;
-
-        fprintf('Computed residuals for subject %d\n', subj);
+        fprintf('Computed activations for subject %d\n', subj);
     end
