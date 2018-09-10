@@ -37,6 +37,6 @@ function beta = ccnl_get_beta(EXPT,model,regressor,mask,subjects)
        
         b = get_beta_or_tmap_helper(regressor, modeldir, Vmask, mask, SPM.xX.name, mask_format, 'beta');
         
-        beta(s,:) = nanmean(b, 1);
+        beta(s,:) = nanmean(b, 1); % collapse across trials
         
     end
