@@ -1,12 +1,13 @@
-function [my_mask, my_vol] = create_mask(my_roi_labels, filename, normalize, group_mask_filename)
+function [my_mask, my_vol] = ccnl_create_mask(my_roi_labels, filename, atlas_name, normalize, group_mask_filename)
 
 % Create a mask from a list of ROI labels.
 %
 % USAGE:
-%   [my_mask, my_vol] = create_mask(my_roi_labels, filename, normalize, group_mask_filename)
+%   [my_mask, my_vol] = ccnl_create_mask(my_roi_labels, filename, normalize, group_mask_filename)
 %
 % EXAMPLE:
-%   [my_mask, my_vol] = create_mask({'Hippocampus_L', 'Hippocampus_R'}, 'masks/hippocampus.nii', true, 'masks/mask.nii')
+%   [my_mask, my_vol] = ccnl_create_mask({'Hippocampus_L', 'Hippocampus_R'}, 'masks/hippocampus.nii')
+%   [my_mask, my_vol] = ccnl_create_mask({'Hippocampus_L', 'Hippocampus_R'}, 'masks/hippocampus.nii', 'AAL2', true, 'masks/mask.nii')
 %
 % INPUT:
 %   my_roi_labels = cell array with AAL2 labels of the ROIs to include, e.g.
@@ -15,18 +16,26 @@ function [my_mask, my_vol] = create_mask(my_roi_labels, filename, normalize, gro
 %                   "Implementation of a new parcellation of the orbitofrontal cortex in the automated anatomical labeling atlas"
 %                   Neuroimage, 2015
 %   filename = output filename where to save the .nii file
-%   normalize = true if you want to put the mask in the coordinate space of
-%               our subject group-level mask and to exclude any voxels that
-%               are not included in the subject group-level mask
-%               false if you want to leave the mask in AAL2 space
-%   group_mask_filename = path to group-level mask; only used for normalization
+%   atlas_name (optional) = atlas name; options are 'AAL2', 'AnatomyToolbox', 'HarvardOxford-maxprob-thr0', 'Brodmann', 'Talairach', 'RL' (defaults to 'AAL2')
+%   normalize (optional) = true if you want to put the mask in the coordinate space of
+%                          our subject group-level mask and to exclude any voxels that
+%                          are not included in the subject group-level mask
+%                          false (default) if you want to leave the mask in AAL2 space
+%   group_mask_filename (optional) = path to group-level mask; mandatory if normalize = true
 %
 % OUTPUT:
 %   my_mask = the actual mask as a 3D binary vector
 %   my_vol = the corresponding SPM volume variable
 %
 
-atlas_name = 'AAL2';
+if ~exist('normalize', 'var')
+    normalize = false;
+end
+
+if ~exist('atlas_name', 'var')
+    atlas_name = 'AAL2';
+end
+
 [curdir, ~, ~] = fileparts(mfilename('fullpath')); 
 atlas_dirpath = fullfile(curdir, 'atlases');
 

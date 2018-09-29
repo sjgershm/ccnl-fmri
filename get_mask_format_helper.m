@@ -23,4 +23,3 @@ function [mask_format, mask, Vmask] = get_mask_format_helper(mask)
             end
         end
     end
-    disp(mask_format);
