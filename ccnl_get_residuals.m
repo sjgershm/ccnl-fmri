@@ -2,7 +2,6 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
     
     % Extract residuals coefficients from a mask.
     % Caution: don't use for too many voxels
-    % TODO does NOT work when subjects have different # of runs ... neither does ccnl_get_beta and ccnl_get_tmap
     %
     % USAGE: residuals = ccnl_get_residuals(EXPT,model,mask,[subjects])
     %

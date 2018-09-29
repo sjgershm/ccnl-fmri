@@ -13,7 +13,7 @@ function table = ccnl_results_table(varargin)
     %   table = ccnl_results_table('Brodmann', 'vote', exploration_expt(), 1, 'RR - SS', 0.001, '+', 0.05)
     %
     % INPUT:
-    %   atlas_name = name of atlas to use; options are 'AAL2', 'AnatomyToolbox', 'HarvardOxford-maxprob-thr0', 'Brodmann', 'Talairach' (defaults to 'AAL2')
+    %   atlas_name = name of atlas to use; options are 'AAL2', 'AnatomyToolbox', 'HarvardOxford-maxprob-thr0', 'Brodmann', 'Talairach', 'RL' (defaults to 'AAL2')
     %   method = how to pick the cluster names, should be one of 'peak', 'vote', or 'all' (bspmview default is 'peak')
     %   ...the rest of the parameters are the same as in ccnl_extract_clusters()
     %
