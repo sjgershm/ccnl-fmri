@@ -35,13 +35,10 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         load(fullfile(modeldir,'SPM.mat'));
        
         % extract voxel activations
-        nScans = length(SPM.xY.VY); % # of TRs
-        for j=1:nScans
-            if strcmp(mask_format, 'cor')
-                Y(j,:) = spm_data_read(SPM.xY.VY(j), 'xyz', mask');
-            else
-                Y(j,:) = spm_data_read(SPM.xY.VY(j), mask);
-            end
+        if strcmp(mask_format, 'cor')
+            Y = spm_data_read(SPM.xY.VY, 'xyz', mask');
+        else
+            Y = spm_data_read(SPM.xY.VY, mask);
         end
 
         %-Whiten/Weight data and remove filter confounds
