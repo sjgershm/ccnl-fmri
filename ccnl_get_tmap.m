@@ -2,6 +2,7 @@ function tmap = ccnl_get_tmap(EXPT,model,regressor,mask,subjects)
     
     % Extract t-statistics from a mask. Also see ccnl_get_beta.
     % Works only for single-regressor contrasts.
+    % You need to have run ccnl_fmri_con first.
     %
     % USAGE: tmap = ccnl_get_tmap(EXPT,model,regressor,mask,[subjects])
     %
