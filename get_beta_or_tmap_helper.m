@@ -3,8 +3,8 @@
 function y = get_beta_or_tmap_helper(regressor, modeldir, Vmask, mask, names, mask_format, prefix)
     n = 0;
     for i = 1:length(names)
-        if ischar(regressor) && (~isempty(strfind(names{i},[regressor,'*'])) || ~isempty(strfind(names{i},[regressor,'^'])) || endsWith(names{i},regressor)) ...
-           || ~ischar(regressor) && i == regressor
+        if (ischar(regressor) && (~isempty(strfind(names{i},[regressor,'*'])) || ~isempty(strfind(names{i},[regressor,'^'])) || endsWith(names{i},regressor))) ...
+           || (~ischar(regressor) && i == regressor)
             n = n + 1;
             V = spm_vol(fullfile(modeldir,sprintf('%s_%04d.nii',prefix,i)));    % residual variance or t-statistic image
             Y = spm_read_vols(V);
