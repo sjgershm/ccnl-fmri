@@ -19,6 +19,7 @@ function [beta, ResMS] = ccnl_roi_glm(EXPT, model, mask, regressor, subjects)
     %   beta - [nSubjects] beta coefficients
     %   ResMS - [nSubjects] residual variance
     %
+    % Momchil Tomov, Oct 2018
 
     if ~exist('subjects', 'var')
         subjects = 1:length(EXPT.subject);

@@ -6,6 +6,8 @@ function ccnl_check_mask(EXPT,model,contrast)
     % one will be created.
     %
     % USAGE: ccnl_check_mask(EXPT,model,contrast)
+    %
+    % Momchil Tomov, Nov 2016
 
     modeldir = fullfile(EXPT.modeldir,['model',num2str(model)]);
     load(fullfile(modeldir,'contrasts'));

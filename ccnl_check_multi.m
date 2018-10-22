@@ -25,6 +25,7 @@ function ccnl_check_multi(EXPT, glmodels, subjs, runs, do_plot)
 %   ccnl_check_multi(exploration_expt(), 1, 1, 1:8)
 %   ccnl_check_multi(exploration_expt(), 1, 1, 1, true)
 % 
+% Momchil Tomov, Aug 2018
 
 % set default parameters
 %

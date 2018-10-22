@@ -1,6 +1,8 @@
 % helper function that figures out the what format a lit of voxels is in
 % potentially actually loads the mask
 %
+% Momchil Tomov, Aug 2018
+%
 function [mask_format, mask, Vmask] = get_mask_format_helper(mask)
 
     % figure out how voxels are provided

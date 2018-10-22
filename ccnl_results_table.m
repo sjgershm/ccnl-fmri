@@ -20,6 +20,7 @@ function table = ccnl_results_table(varargin)
     % OUTPUT:
     %   table = the bspmview results table
     % 
+    % Momchil Tomov, Aug 2018
 
     [curdir, ~, ~] = fileparts(mfilename('fullpath')); 
     atlas_dirpath = fullfile(curdir, 'atlases');

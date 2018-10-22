@@ -27,6 +27,7 @@ function [my_mask, my_vol] = ccnl_create_mask(my_roi_labels, filename, atlas_nam
 %   my_mask = the actual mask as a 3D binary vector
 %   my_vol = the corresponding SPM volume variable
 %
+% Momchil Tomov, Sep 2018
 
 if ~exist('normalize', 'var')
     normalize = false;

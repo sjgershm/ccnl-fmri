@@ -1,6 +1,7 @@
 function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
 
     % Compute the searchlight neural RDMs
+    % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
     %
     % USAGE:
     %   [Neural] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds)
@@ -66,7 +67,7 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
         modeldir = fullfile(EXPT.modeldir,['model',num2str(rsa.glmodel)],['subj',num2str(subj)]);
         load(fullfile(modeldir,'SPM.mat'));
         which = contains(SPM.xX.name, rsa.event); % betas for given event
-        which(which) = rsa.which_trials; % of those, only betas for given trials
+        which(which) = rsa.which_betas; % of those, only betas for given trials
         cdir = pwd;
         cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
         B = spm_data_read(SPM.Vbeta(which), find(mask));

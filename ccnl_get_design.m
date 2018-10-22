@@ -20,6 +20,7 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
     % EXAMPLE:
     %   [X, names] = ccnl_get_design(exploration_expt(), 18, 1, 1)
     % 
+    % Momchil Tomov, Aug 2018
 
 
     res = 100;

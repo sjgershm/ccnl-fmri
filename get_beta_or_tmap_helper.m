@@ -1,5 +1,7 @@
 % helper function that extracts quantities from .nii files
 %
+% Momchil Tomov, Aug 2018
+%
 function y = get_beta_or_tmap_helper(regressor, modeldir, Vmask, mask, names, mask_format, prefix)
     n = 0;
     for i = 1:length(names)

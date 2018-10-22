@@ -2,12 +2,13 @@ function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subjects)
 
     % Run searchlight RSA on a set of voxels. Useful to run in 
     % batches of e.g. 10000 voxels.
+    % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
     %
     % USAGE:
     %   ccnl_rsa_searchlight(EXPT, rsa_idx, inds [, subjects])    
     %
     % EXAMPLE:
-    %   [Behavioral, control] = ccnl_rsa_searchlight(exploration_expt(), 1, 1:10000);
+    %   ccnl_rsa_searchlight(exploration_expt(), 1, 1:10000);
     %
     % INPUT:
     %   EXPT - experiment structure
@@ -27,20 +28,20 @@ function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subjects)
     if ~isdir(rsadir); mkdir(rsadir); end
 
     % gen filename
-    filename = sprintf('searchlight_%s.mat', random_string());
+    filename = sprintf('searchlight_%d-%d_%s.mat', min(inds), max(inds), random_string());
     disp(fullfile(rsadir, filename));
-
-    % get searchlight RDMs
-    [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects);
 
     % get behavioral (model) RDMs
     [Behavioral, control] = ccnl_behavioral_rdms(EXPT, rsa_idx, subjects);
+
+    % get searchlight RDMs
+    [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects);
 
     % compute second-order correlations (similarity match)
     [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, control);
 
     % save output 
-    save(fullfile(rsadir, filename), 'cor', 'Rho', 'H', 'T', 'P', 'all_subject_rhos', 'inds', 'rsa_idx');
+    save(fullfile(rsadir, filename), 'cor', 'Rho', 'H', 'T', 'P', 'all_subject_rhos', 'inds', 'rsa_idx', '-v7.3');
 end
 
 
