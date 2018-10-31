@@ -36,20 +36,21 @@ function [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, 
             %
             subjs_rhos = []; % Spearman rhos: col = subject, one rho per
             for s = 1:length(Behavioral(1).subj)
-                neural_RDM = triu(Neural(n).subj(s).RDM, 1);
-                neural_RDM = neural_RDM(:);
+                assert(isequal(size(Neural(n).subj(s).RDM), size(Behavioral(m).subj(s).RDM)), 'Neural and behavioral RDMs should be equal -- check rsa.which_trials');
 
-                behavioral_RDM = triu(Behavioral(m).subj(s).RDM, 1);
-                behavioral_RDM = behavioral_RDM(:);
+                upper = logical(triu(ones(size(Neural(n).subj(s).RDM)), 1)); % only take values above main diagonal
+                    
+                neural_RDM = Neural(n).subj(s).RDM(upper); 
+                %neural_RDM = neural_RDM(randperm(size(neural_RDM, 1)), randperm(size(neural_RDM, 2))); TODO null distribution?
 
-                assert(isequal(size(neural_RDM), size(behavioral_RDM)), 'Neural and behavioral RDMs should be equal -- check rsa.which_trials');
+                behavioral_RDM = Behavioral(m).subj(s).RDM(upper);
 
                 % control RDMs
                 control_RDMs = [];
                 if ~ismember(m, control) % do not correct control RDMs for themselves (you get nothing)
                     for i = 1:length(control)
-                        control_RDM = triu(Behavioral(control(i)).subj(s).RDM, 1);
-                        control_RDMs(:, i) = control_RDM(:);
+                        control_RDM = Behavioral(control(i)).subj(s).RDM(upper);
+                        control_RDMs(:, i) = control_RDM;
                     end
                 end
 
@@ -61,6 +62,7 @@ function [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, 
                 end
                 subjs_rhos = [subjs_rhos, subj_rho];
                 all_subject_rhos(n, m, s) = subj_rho;            
+
             end
 
             models_subjs_rhos = [models_subjs_rhos; subjs_rhos]; % for group-level analysis

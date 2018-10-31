@@ -29,9 +29,16 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
     %   
     % Momchil Tomov, Sep 2018
 
+    rng('shuffle'); % for parallelization
+
     if ~exist('subjects', 'var')
         subjects = 1:length(EXPT.subject);
     end
+
+    % create rsa folder if none exists
+    if ~isdir(EXPT.rsadir); mkdir(EXPT.rsadir); end
+    rsadir = fullfile(EXPT.rsadir,['rsa',num2str(rsa_idx)]);
+    if ~isdir(rsadir); mkdir(rsadir); end
 
     % load example rsa
     rsa = EXPT.create_rsa(rsa_idx, 1);
@@ -63,15 +70,40 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
 
         rsa = EXPT.create_rsa(rsa_idx, subj);
 
-        % load betas 
-        modeldir = fullfile(EXPT.modeldir,['model',num2str(rsa.glmodel)],['subj',num2str(subj)]);
-        load(fullfile(modeldir,'SPM.mat'));
-        which = contains(SPM.xX.name, rsa.event); % betas for given event
-        which(which) = rsa.which_betas; % of those, only betas for given trials
-        cdir = pwd;
-        cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
-        B = spm_data_read(SPM.Vbeta(which), find(mask));
-        cd(cdir);
+        betas_filename = fullfile(rsadir, sprintf('betas_%d.mat', subj));
+        disp(betas_filename);
+
+        % load (cached) betas
+        if ~exist(betas_filename, 'file')
+            tic
+            disp('loading betas from .nii files...');
+
+            % load betas 
+            modeldir = fullfile(EXPT.modeldir,['model',num2str(rsa.glmodel)],['subj',num2str(subj)]);
+            load(fullfile(modeldir,'SPM.mat'));
+            which = contains(SPM.xX.name, rsa.event); % betas for given event
+            which(which) = rsa.which_betas; % of those, only betas for given trials
+            cdir = pwd;
+            cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
+            B = spm_data_read(SPM.Vbeta(which), find(mask));
+            cd(cdir);
+
+            % save file in "lock-free" fashion
+            % b/c parallel jobs might be doing the same
+            tmp_filename = [betas_filename, random_string()];
+            save(tmp_filename, 'B', '-v7.3');
+            movefile(tmp_filename, betas_filename); % TODO assumes this is instantaneous
+
+            toc
+        else
+            tic
+            disp('loading cached betas from .mat file...');
+            load(betas_filename);
+            toc
+        end
+
+        tic
+        disp('computing RDMs...');
 
         % for each voxel
         for i = 1:length(x)
@@ -92,7 +124,7 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
             % metadata
             Neural(i).subj(s).id = subj;
             Neural(i).cor = [x(i) y(i) z(i)];
-            Neural(i).mni = mni2cor(Neural(i).cor, Vmask.mat);
+            Neural(i).mni = cor2mni(Neural(i).cor, Vmask.mat);
             Neural(i).name = ['sphere_', sprintf('%d_%d_%d', Neural(i).mni), '_', rsa.event];
             Neural(i).radius = radius;
             Neural(i).event = rsa.event;
@@ -100,6 +132,7 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
             Neural(i).num_voxels = sum(sphere_mask(:));
         end
 
+        toc
     end
 
 end

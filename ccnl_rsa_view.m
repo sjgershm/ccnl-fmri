@@ -19,12 +19,13 @@ function ccnl_rsa_view(EXPT, rsa_idx, model_idx)
     rsa = EXPT.create_rsa(rsa_idx, 1);
 
     % initialize empty tmap
-    [~, V, tmap] = load_mask(rsa.mask);
-    tmap(:) = NaN; % clear
+    V = spm_vol(rsa.mask);
+    tmap = nan(V.dim);
     V.fname = fullfile(rsadir, ['searchlight_tmap_', num2str(model_idx), '.nii']); % change immediately!
 
     % compute t-map, if it hasn't been computed already
     if ~exist(V.fname, 'file')
+        df = NaN;
         files = dir(rsadir);
         for i = 1:length(files)
             file = files(i).name;
@@ -35,8 +36,11 @@ function ccnl_rsa_view(EXPT, rsa_idx, model_idx)
                 for j = 1:size(cor, 1)
                     tmap(cor(j,1), cor(j,2), cor(j,3)) = T(j, model_idx);
                 end
+                df = size(all_subject_rhos, 3) - 1;
             end
         end
+
+        V.descrip = sprintf('SPM{T_[%d.0]}', df); % hack to write the degrees of freedom, to allow thresholding in bspmview
 
         % save tmap
         spm_write_vol(V, tmap);
