@@ -46,7 +46,7 @@ function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subbatch_size, subjects)
     %
     all_inds = sort(inds);
     for s = 1:subbatch_size:length(all_inds)
-        e = min(length(all_inds), s + subbatch_size);
+        e = min(length(all_inds), s + subbatch_size - 1);
         inds = all_inds(s:e);
 
         fprintf('\n------- subbatch %d-%d ------\n\n', s, e);

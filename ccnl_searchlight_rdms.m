@@ -59,6 +59,7 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
     max_z = max(z);
 
     % get voxels we care about
+    inds = inds(inds <= length(x));
     x = x(inds);
     y = y(inds);
     z = z(inds);

@@ -21,7 +21,12 @@ function ccnl_rsa_view(EXPT, rsa_idx, model_idx)
     % initialize empty tmap
     V = spm_vol(rsa.mask);
     tmap = nan(V.dim);
+
+    % hacks to make it save the t-map as a t-map
     V.fname = fullfile(rsadir, ['searchlight_tmap_', num2str(model_idx), '.nii']); % change immediately!
+    V.dt = [16 0];
+    V.private.dat.dtype = 'FLOAT32-LE';
+    V.private.dat.fname = V.fname;
 
     % compute t-map, if it hasn't been computed already
     if ~exist(V.fname, 'file')
@@ -43,6 +48,7 @@ function ccnl_rsa_view(EXPT, rsa_idx, model_idx)
         V.descrip = sprintf('SPM{T_[%d.0]}', df); % hack to write the degrees of freedom, to allow thresholding in bspmview
 
         % save tmap
+        V.fname
         spm_write_vol(V, tmap);
     end
 
