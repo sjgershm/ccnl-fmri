@@ -1,4 +1,4 @@
-function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = ccnl_extract_clusters(EXPT, model, contrast, p, direct, alpha, Dis, Num, clusterFWEcorrect)
+function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = ccnl_extract_clusters(EXPT, model, contrast, p, direct, alpha, Dis, Num, clusterFWEcorrect, extent)
     %
     % Given a contrast, extract all the activation clusters from the t-map 
     % after cluster FWE correction. Code is copy-pasted and adapted from
@@ -23,6 +23,7 @@ function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = cc
     %   Dis (optional) = separation for cluster maxima, default 20 in bspmview
     %   Num (optional) = numpeaks for cluster maxima, default 1 here (3 in bspmview)
     %   clusterFWEcorrect (optional) = whether to perform cluster FWE correction (defaults to true)
+    %   extent (optional) = minimum cluster extent (overrides clusterFWEcorrect; not used by default)
     %
     % OUTPUT:
     %   V = SPM volume of the t-map, with the filename changed so we don't overwrite it accidentally
@@ -58,6 +59,9 @@ function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = cc
     if ~exist('clusterFWEcorrect', 'var')
         clusterFWEcorrect = true;
     end
+    if ~exist('extent', 'var')
+        extent = [];
+    end
 
     % only used for sanity check
     atlas_name = 'AAL2';
@@ -81,12 +85,12 @@ function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = cc
     end
 
     df = length(EXPT.subject) - 1; 
-    fprintf('bspm_extract_clusters(%s, %f, %s, %f, %d, %d, %d, %s, %s, %d)\n', spmT, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect);
+    fprintf('bspm_extract_clusters(%s, %f, %s, %f, %d, %d, %d, %s, %s, %d, %d)\n', spmT, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect, extent);
 
 
     % extract the clusters
     %
-    [C, CI, region, extent, stat, mni, cor, results_table] = bspm_extract_clusters(spmT, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect);
+    [C, CI, region, extent, stat, mni, cor, results_table] = bspm_extract_clusters(spmT, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect, extent);
 
     V = spm_vol(spmT);
     Y = spm_read_vols(V);
@@ -99,7 +103,7 @@ end
 
 
 
-function [C, CI, region, extent, stat, mni, cor, results_table] = bspm_extract_clusters(tmap_filename, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect)
+function [C, CI, region, extent, stat, mni, cor, results_table] = bspm_extract_clusters(tmap_filename, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect, extent)
     %
     % Ripped and refactored from bspmview.
     % Extract clusters and peak voxels from a t-map contrast after cluster FWE
@@ -119,6 +123,7 @@ function [C, CI, region, extent, stat, mni, cor, results_table] = bspm_extract_c
     %   atlas_dirpath = path to bspmview atlas directory
     %   atlas_name = bspmview atlas name
     %   clusterFWEcorrect = whether to do cluster FWE correction
+    %   extent = min cluster extent (overrides cluster FWE corr) 
     % 
     % OUTPUT:
     %   C = volume with cluster size for each voxel
@@ -146,11 +151,16 @@ function [C, CI, region, extent, stat, mni, cor, results_table] = bspm_extract_c
 
     % get cluster extent threshold
     %
-    extent_thresh = bspm_cluster_correct(tmap_filename, df, direct, p, alpha); % FWE; also supports FDR as second argument
-    if isinf(extent_thresh) || ~clusterFWEcorrect 
-        warning('No voxels found after cluster FWE correction. Setting extent threshold = 5.');
-        extent_thresh = 5;
+    if isempty(extent)
+        extent_thresh = bspm_cluster_correct(tmap_filename, df, direct, p, alpha); % FWE; also supports FDR as second argument
+        if isinf(extent_thresh) || ~clusterFWEcorrect 
+            warning('No voxels found after cluster FWE correction. Setting extent threshold = 5.');
+            extent_thresh = 5;
+        end
+    else
+        extent_thresh = extent;
     end
+    fprintf('extent threshold = %d\n', extent_thresh);
 
 
     % get cluster indices
