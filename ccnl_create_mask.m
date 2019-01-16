@@ -45,7 +45,8 @@ atlas_labels_filename =  fullfile(atlas_dirpath, [atlas_name, '_Atlas_Labels.mat
 
 % Load the AAL2 anatomical labels (indices) for each voxel
 %
-[~, atlas_vol, atlas_mask] = load_mask(atlas_filename);
+atlas_vol = spm_vol(atlas_filename);
+atlas_mask = spm_read_vols(atlas_vol);
 
 % Load the AAL2 mapping from label index to label name
 %
@@ -91,7 +92,8 @@ my_mask = ismember(atlas_mask, my_roi_idxs);
 if normalize
     % Load the subject group-level mask
     %
-    [~, group_vol, group_mask] = load_mask(group_mask_filename);
+    group_vol = spm_vol(group_mask_filename);
+    group_mask = spm_read_vols(group_vol);
 
     [x, y, z] = ind2sub(size(my_mask), find(my_mask)); % binary mask --> voxel indices --> voxel coordinates in AAL2 space
     cor = mni2cor(cor2mni([x y z], my_vol.mat), group_vol.mat); % voxel coords in AAL2 space --> voxel coords in MNI space --> voxel coords in our space
