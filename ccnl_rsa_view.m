@@ -52,8 +52,6 @@ function ccnl_rsa_view(EXPT, rsa_idx, model_idx)
         spm_write_vol(V, tmap);
     end
 
-    save shit.mat
-
     % view tmap
     struc = fullfile(EXPT.modeldir,'mean.nii');
     if exist(struc,'file')
