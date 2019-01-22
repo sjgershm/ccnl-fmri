@@ -52,7 +52,13 @@ function ccnl_rsa_view(EXPT, rsa_idx, model_idx)
         spm_write_vol(V, tmap);
     end
 
+    save shit.mat
+
     % view tmap
     struc = fullfile(EXPT.modeldir,'mean.nii');
-    bspmview(V.fname, struc);
+    if exist(struc,'file')
+        bspmview(V.fname, struc);
+    else
+        bspmview(V.fname);
+    end
 end
