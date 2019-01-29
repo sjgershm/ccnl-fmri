@@ -1,7 +1,7 @@
 function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subbatch_size, subjects)
 
     % Run searchlight RSA on a set of voxels. Useful to run in 
-    % parallel in batches of e.g. 10000 voxels.
+    % parallel in batches of e.g. 10000 voxels. Also see ccnl_rsa_view.m
     % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
     %
     % USAGE:
