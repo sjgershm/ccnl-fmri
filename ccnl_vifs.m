@@ -1,40 +1,37 @@
-function [vifs, names] = ccnl_vifs(EXPT, model)
+function [vifs, names] = ccnl_vifs(EXPT, model, subjects)
 
     % Compute Variance Inflation Factors (VIFs) for given GLM.
     % Need to run ccnl_fmri_glm first to compute the SPM.mat's
     %
     % USAGE:
-    %   [vifs, names] = ccnl_vifs(EXPT, glmodel)
+    %   [vifs, names] = ccnl_vifs(EXPT, glmodel, [subjects])
     %
     % INPUTS:
     %   EXPT - experiment structure
     %   model - model number
+    %   subjects (optional) - which subjects to analyze (default all subjects)
     %
     % OUTPUTS:
-    %   vifs - [nRegressors] variance inflation factors
-    %   names - [nRegressors] regressor names
+    %   vifs - [nSubjects] cell array of [nRegressors] variance inflation factors for each subject
+    %   names - [nSubjects] cell array of [nRegressors] regressor names for each subject
     %
 
-    subjects = 1:length(EXPT.subject);
+    if ~exist('subjects', 'var')
+        subjects = 1:length(EXPT.subject);
+    end
 
     for s = 1:length(subjects)
         subj = subjects(s);
         modeldir = fullfile(EXPT.modeldir,['model',num2str(model)],['subj',num2str(subj)]);
         if ~exist(fullfile(modeldir,'SPM.mat'), 'file')
-            % keep looking; we only need to find one subject with a SPM.mat
-            continue;
+            assert(false, ['No SPM.mat found for subject ', num2str(subj), ' -- make sure to run GLM first.']);
         end
 
         out = scn_spm_design_check(modeldir, 'events_only');
 
-        break; % we only need to find one subject with a SPM.mat
+        vifs{s} = out.allvifs;
+        names{s} = out.name;
     end
-
-    if ~exist('out', 'var')
-        assert(false, 'No SPM.mat found for any subject -- make sure to run GLM first.');
-    end
-    names = out.name;
-    vifs = out.allvifs;
 
 end
 
