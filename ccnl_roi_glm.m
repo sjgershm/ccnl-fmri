@@ -41,6 +41,7 @@ function [beta, ResMS] = ccnl_roi_glm(EXPT, model, mask, regressor, subjects)
         subj = subjects(s);
         modeldir = fullfile(EXPT.modeldir,['model',num2str(model)],['subj',num2str(subj)]);
         load(fullfile(modeldir,'SPM.mat'));
+        assert(isequal(SPM.xY.VY(1).dim, Vmask.dim), 'Different dimensions between mask and activations');
 
         nScans = length(SPM.xY.VY); % # of TRs
 

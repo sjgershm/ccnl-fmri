@@ -63,6 +63,7 @@ function v = ccnl_vbm(EXPT, mask, subjects, tissue, modulated)
         tissuefile = fullfile(S.datadir, [prefix, S.structural]);
 
         V = spm_vol(tissuefile);
+        assert(isequal(V.dim, Vmask.dim), 'Different dimensions between mask and tissue volume');
 
         % extract tissue map
         if strcmp(mask_format, 'cor')

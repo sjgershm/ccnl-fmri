@@ -55,6 +55,7 @@ function dec = ccnl_decode_regressor(EXPT, glmodel, regressor, mask, lambda, sub
         subj = subjects(s);
         modeldir = fullfile(EXPT.modeldir,['model',num2str(glmodel)],['subj',num2str(subj)]);
         load(fullfile(modeldir,'SPM.mat'));
+        assert(isequal(SPM.Vbeta(1).dim, Vmask.dim), 'Different dimensions between mask and betas');
 
         % extract betas B and (filtered) design matrix X
         cdir = pwd;

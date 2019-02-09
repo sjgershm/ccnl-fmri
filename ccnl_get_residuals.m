@@ -33,6 +33,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         subj = subjects(s);
         modeldir = fullfile(EXPT.modeldir,['model',num2str(model)],['subj',num2str(subj)]);
         load(fullfile(modeldir,'SPM.mat'));
+        assert(isequal(SPM.xY.VY(1).dim, Vmask.dim), 'Different dimensions between mask and activations');
        
         % extract voxel activations
         if strcmp(mask_format, 'cor')
