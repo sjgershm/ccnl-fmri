@@ -52,7 +52,7 @@ function v = ccnl_vbm(EXPT, mask, subjects, tissue, modulated)
     [mask_format, mask, Vmask] = get_mask_format_helper(mask);
     % convert logicals to indices
     if strcmp(mask_format, 'mask') || islogical(mask)
-        mask = find(mask);
+        inds = find(mask);
     end
 
     % Loop over subjects
@@ -63,13 +63,19 @@ function v = ccnl_vbm(EXPT, mask, subjects, tissue, modulated)
         tissuefile = fullfile(S.datadir, [prefix, S.structural]);
 
         V = spm_vol(tissuefile);
-        assert(isequal(V.dim, Vmask.dim), 'Different dimensions between mask and tissue volume');
+        %assert(isequal(V.dim, Vmask.dim), 'Different dimensions between mask and tissue volume');
+        % resize mask according to data volume dimensions
+        if ~strcmp(mask_format, 'cor') && ~isequal(V.dim, Vmask.dim)
+            [mask_cor1, mask_cor2, mask_cor3] = ind2sub(size(mask), find(mask));
+            cor = mni2cor(cor2mni([mask_cor1 mask_cor2 mask_cor3], Vmask.mat),V.mat);
+            inds = sub2ind(V.dim,cor(:,1),cor(:,2),cor(:,3));
+        end
 
         % extract tissue map
         if strcmp(mask_format, 'cor')
             Y = spm_data_read(V, 'xyz', mask');
         else
-            Y = spm_data_read(V, mask);
+            Y = spm_data_read(V, inds);
         end
 
         v(s) = nansum(Y);
