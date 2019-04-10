@@ -21,7 +21,7 @@ function beta = ccnl_get_beta(EXPT,model,regressor,mask,subjects)
     % Sam Gershman, Nov 2016
     % Momchil Tomov, Aug 2018
     
-    if nargin < 4; subjects = 1:length(EXPT.subject); end
+    if nargin < 5; subjects = 1:length(EXPT.subject); end
 
     % load mask
     [mask_format, mask, Vmask] = get_mask_format_helper(mask);

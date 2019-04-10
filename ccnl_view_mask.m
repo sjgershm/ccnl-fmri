@@ -26,7 +26,13 @@ function ccnl_view_mask(mask)
             filenames = [filenames, masks(i)];
         else
             mask = double(masks{i});
-            filename = sprintf('temp/tmp_%d.nii', i);
+
+            if ~exist('temp', 'dir')
+                mkdir('temp');
+            end
+            filename = fullfile('temp', sprintf('tmp_%d.nii', i));
+            
+            filename
             niftiwrite(mask, filename);
             filenames = [filenames, {filename}];
         end
