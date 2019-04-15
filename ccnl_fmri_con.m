@@ -35,7 +35,7 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
                 %found = false;
                 ix = logical(zeros(1,length(SPM.xX.name)));
                 for i = 1:length(SPM.xX.name)
-                    if isequal(strfind(SPM.xX.name{i},[con{c},'*']), 1) || ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
+                    if isequal(strfind(SPM.xX.name{i},[con{c},'*']), 1) || ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'*'])) || ~isempty(strfind(SPM.xX.name{i},[' ',con{c},'^']))  || ~isempty(strfind(SPM.xX.name{i},['x',con{c},'^']))
                         convec(j,i) = C(sgn{c});
                         N(c) = N(c) + 1;
                         ix(i) = 1;
