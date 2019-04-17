@@ -3,6 +3,8 @@ function ccnl_fmri_con(EXPT,model,contrasts,subjects)
     % Construct contrasts and perform group-level analysis.
     %
     % USAGE: ccnl_fmri_con(EXPT,model,contrasts,[subjects])
+
+    fprintf('Computing contrasts for GLM %d\n', model);
     
     if nargin < 4; subjects = 1:length(EXPT.subject); end
     cdir = pwd;
