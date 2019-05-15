@@ -16,7 +16,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
     %   subjects (optional) - which subjects to analyze (default all subjects)
     %
     % OUTPUTS:
-    %   residuals - [nScans x nVoxels x nSubjects] residuals
+    %   residuals{s} - [nScans x nVoxels] residuals for subject s
     %
     % Momchil Tomov, Aug 2018
     
@@ -58,7 +58,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         end
         assert(immse(ResSS / SPM.xX.trRV, ResMS) < 1e-9, ['Computed residuals don''t match ResMS.nii for subject', num2str(subj)]);  % ResMS = ResSS scaled by tr(RV)
 
-        residuals(:,:,s) = res;
+        residuals{s} = res;
 
         fprintf('Computed residuals for subject %d\n', subj);
     end

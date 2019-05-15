@@ -57,7 +57,7 @@ function dec = ccnl_decode_regressor(EXPT, glmodel, regressor, mask, lambda, sub
         load(fullfile(modeldir,'SPM.mat'));
         assert(isequal(SPM.Vbeta(1).dim, Vmask.dim), 'Different dimensions between mask and betas');
 
-        % extract betas B and (filtered) design matrix X
+        % extract betas B and design matrix X
         cdir = pwd;
         cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
         if strcmp(mask_format, 'cor')
@@ -66,11 +66,15 @@ function dec = ccnl_decode_regressor(EXPT, glmodel, regressor, mask, lambda, sub
             B = spm_data_read(SPM.Vbeta, mask);
         end
         cd(cdir);
-        X = SPM.xX.xKXs.X;
+
+        %X = SPM.xX.xKXs.X; %  use high-pass filtered & whitened design matrix
+        X = SPM.xX.X; % use unfilterd, unwhitened design matrix
 
         % separate our regressor from the rest
         names = SPM.xX.name'; % regressor names
         which_reg = contains(names, regressor);
+
+        assert(sum(which_reg) == length(EXPT.subject(subj).functional), 'Number of regressors that match is different from number of runs -- maybe add x and ^ prefix and suffix?');
 
         % separate X's and betas into matrices that do or don't have our regressor
         B_noreg = B(~which_reg, :);
@@ -79,9 +83,9 @@ function dec = ccnl_decode_regressor(EXPT, glmodel, regressor, mask, lambda, sub
         X_noreg = X(:, ~which_reg);
         X_reg = X(:, which_reg);
 
-        % extract activations, then whiten & apply filter (see spm_spm.m)
+        % extract activations 
         act = ccnl_get_activations(EXPT, glmodel, mask, subj);
-        act = spm_filter(SPM.xX.K,SPM.xX.W*act);
+        %act = spm_filter(SPM.xX.K,SPM.xX.W*act); % whiten & high-pass filter (see spm_spm.m)
 
         % decode regressor
         dec{s} = (act - X_noreg * B_noreg) .* B_reg ./ (B_reg.^2 + lambda);
