@@ -25,12 +25,12 @@ function dec = ccnl_decode_regressor(EXPT, glmodel, regressor, mask, lambda, sub
     %          a binary vector/mask in native space,
     %          or a list of voxels in native coordinates as a [N x 3] matrix
     %          (use mni2cor first if coordinates are in MNI space)
-    %   lambda (optional) - regularization constant (defaults to 0, i.e. maximum likelihood estimate)
+    %   lambda (optional) - regularization constant (defaults to 0, i.e. maximum likelihood estimate), or array of lambdas
     %   subjects (optional) - which subjects to analyze (default all subjects)
     %
     % OUTPUTS:
     %   dec - {nSubjects} struct array with decoded regressor for each subject:
-    %      dec{s} - [nTRs x nVoxels] decoded regressor for each TR for each voxel in the mask, for subject s
+    %      dec{s} - [nTRs x nVoxels x nLambdas] decoded regressor for each TR for each voxel in the mask, for subject s (optionally for each lambda)
     %
     % EXAMPLE:
     %   dec = ccnl_decode_regressor(exploration_expt(), 21, 'RU', 'rlpfc.nii', 1)
@@ -88,5 +88,13 @@ function dec = ccnl_decode_regressor(EXPT, glmodel, regressor, mask, lambda, sub
         %act = spm_filter(SPM.xX.K,SPM.xX.W*act); % whiten & high-pass filter (see spm_spm.m)
 
         % decode regressor
-        dec{s} = (act - X_noreg * B_noreg) .* B_reg ./ (B_reg.^2 + lambda);
+        if length(lambda) == 1
+            dec{s} = (act - X_noreg * B_noreg) .* B_reg ./ (B_reg.^2 + lambda);
+        else
+            numer = (act - X_noreg * B_noreg) .* B_reg;
+            B_reg2 = B_reg.^2;
+            for l = 1:length(lambda)
+                dec{s}(:,:,l) = numer ./ (B_reg2 + lambda(l));
+            end
+        end
     end
