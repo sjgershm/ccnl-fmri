@@ -28,7 +28,7 @@ function ccnl_fmri_glm(EXPT,model,subjects,fake)
     
     % hrf specification; use canonical hrf by default
     if isfield(EXPT,'bases')
-        job.bases = bases;
+        job.bases = EXPT.bases;
     else
         job.bases.hrf.derivs = [0 0];
     end
