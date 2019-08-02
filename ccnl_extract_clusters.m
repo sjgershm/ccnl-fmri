@@ -1,4 +1,4 @@
-function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = ccnl_extract_clusters(EXPT, model, contrast, p, direct, alpha, Dis, Num, clusterFWEcorrect, extent)
+function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = ccnl_extract_clusters(EXPT, model, contrast, p, direct, alpha, Dis, Num, clusterFWEcorrect, extent, df)
     %
     % Given a contrast, extract all the activation clusters from the t-map 
     % after cluster FWE correction. Code is copy-pasted and adapted from
@@ -24,6 +24,7 @@ function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = cc
     %   Num (optional) = numpeaks for cluster maxima, default 1 here (3 in bspmview)
     %   clusterFWEcorrect (optional) = whether to perform cluster FWE correction (defaults to true)
     %   extent (optional) = minimum cluster extent (overrides clusterFWEcorrect; not used by default)
+    %   df (optional) = degrees of freedom in t-test (# of subjects - 1)
     %
     % OUTPUT:
     %   V = SPM volume of the t-map, with the filename changed so we don't overwrite it accidentally
@@ -83,8 +84,11 @@ function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = cc
         end
         spmT = fullfile(EXPT.modeldir,['model',num2str(model)],['con',num2str(ix)],'spmT_0001.nii');
     end
+    
+    if ~exist('df', 'var')
+        df = length(EXPT.subject) - 1; 
+    end
 
-    df = length(EXPT.subject) - 1; 
     fprintf('bspm_extract_clusters(%s, %f, %s, %f, %d, %d, %d, %s, %s, %d, %d)\n', spmT, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect, extent);
 
 
@@ -166,6 +170,11 @@ function [C, CI, region, extent, stat, mni, cor, results_table] = bspm_extract_c
     % get cluster indices
     %
     thresh = spm_invTcdf(1-p, df);
+    
+    p
+    df
+    thresh
+    
     V = spm_vol(tmap_filename);
     Y = spm_read_vols(V);
     Y(isnan(Y)) = 0;
