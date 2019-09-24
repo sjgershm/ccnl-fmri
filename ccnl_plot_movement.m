@@ -41,7 +41,6 @@ function ccnl_plot_movement(EXPT,subj)
     ax=axes('Position',[0.1 0.35 0.8 0.2],'Parent',fg,'XGrid','on','YGrid','on');
     plot(Params(:,1:3),'Parent',ax)
     s = ['x translation';'y translation';'z translation'];
-    legend(ax, s, 0)
     set(get(ax,'Title'),'String','translation','FontSize',16,'FontWeight','Bold');
     set(get(ax,'Xlabel'),'String','image');
     set(get(ax,'Ylabel'),'String','mm');
@@ -49,11 +48,11 @@ function ccnl_plot_movement(EXPT,subj)
     for i = 1:length(nscan)
         plot([nscan(i) nscan(i)],get(gca,'YLim'),'--k','Parent',ax);
     end
+    legend(ax, s)
     
     ax=axes('Position',[0.1 0.05 0.8 0.2],'Parent',fg,'XGrid','on','YGrid','on');
     plot(Params(:,4:6)*180/pi,'Parent',ax)
     s = ['pitch';'roll ';'yaw  '];
-    legend(ax, s, 0)
     set(get(ax,'Title'),'String','rotation','FontSize',16,'FontWeight','Bold');
     set(get(ax,'Xlabel'),'String','image');
     set(get(ax,'Ylabel'),'String','degrees');
@@ -61,3 +60,4 @@ function ccnl_plot_movement(EXPT,subj)
     for i = 1:length(nscan)
         plot([nscan(i) nscan(i)],get(gca,'YLim'),'--k','Parent',ax);
     end
+    legend(ax, s)
