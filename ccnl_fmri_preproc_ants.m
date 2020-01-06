@@ -39,7 +39,7 @@ if nargin < 3; def = spm_get_defaults; end % SPM defaults
 if nargin < 2; subjects = 1:length(EXPT.subject); end
 
 [ccnl_fmri_dir, ~, ~] = fileparts(mfilename('fullpath')); 
-templatesdir_path = fullfile(ccnl_fmri_dir, 'templates');
+templatesdir_path = fullfile(ccnl_fmri_dir, 'templates/');
 
 % Loop over subjects
 for subj = subjects
