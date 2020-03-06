@@ -7,7 +7,7 @@ function activations = ccnl_get_activations(EXPT,model,mask,subjects)
     %
     % INPUTS:
     %   EXPT - experiment structure
-    %   model - model number
+    %   model - model number (any one will do)
     %   mask - a mask image name (e.g., 'mask.nii') in MNI or native space,
     %          a list of voxel indices in native space,
     %          a binary vector/mask in native space,

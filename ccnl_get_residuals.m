@@ -56,7 +56,7 @@ function residuals = ccnl_get_residuals(EXPT,model,mask,subjects)
         else
             ResMS = spm_data_read(V, mask);
         end
-        assert(immse(ResSS / SPM.xX.trRV, ResMS) < 1e-9, ['Computed residuals don''t match ResMS.nii for subject', num2str(subj)]);  % ResMS = ResSS scaled by tr(RV)
+        assert(immse(ResSS / SPM.xX.trRV, ResMS) < 1e-9, ['Computed residuals don''t match ResMS.nii for subject', num2str(subj), ' -- maybe mask has out-of-brain voxels?']);  % ResMS = ResSS scaled by tr(RV)
 
         residuals{s} = res;
 

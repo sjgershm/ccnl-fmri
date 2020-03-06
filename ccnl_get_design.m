@@ -37,9 +37,9 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
     names = {};
     for j = 1:length(multi.names)
         onsets = multi.onsets{j} * res;
+        durations = multi.durations{j} * res;
 
-        x = zeros(ceil(max_onset),1);
-        x(round(onsets)) = 1;
+        x = populate_regressor(onsets, durations, ones(size(onsets)), max_onset);
         x = convolve_and_subsample(x, res);
         if j == 1
             X = x;
@@ -53,8 +53,7 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
             for k = 1:length(multi.pmod(j).name)
                 assert(length(onsets) == length(multi.pmod(j).param{k}), ['multi.pmod(', num2str(j), ').param{', num2str(k), '} has the wrong number of elements']);
 
-                x = zeros(ceil(max_onset),1);
-                x(round(onsets)) = multi.pmod(j).param{k};
+                x = populate_regressor(onsets, durations, multi.pmod(j).param{k}, max_onset);
                 x = convolve_and_subsample(x, res);
                 X = [X x];
                 names = [names, multi.pmod(j).name(k)];
@@ -62,6 +61,14 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
         end
     end
 
+end
+
+
+function x = populate_regressor(onsets, durations, values, max_onset)
+    x = zeros(ceil(max_onset),1);
+    for i = 1:length(onsets)
+        x(round(onsets(i)):round(min(max_onset, onsets(i)+durations(i)))) = values(i);
+    end
 end
 
 
