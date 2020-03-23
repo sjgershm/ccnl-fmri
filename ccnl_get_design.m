@@ -1,4 +1,4 @@
-function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
+function [X, names, X_nohrf] = ccnl_get_design(EXPT, glmodel, subj, run)
 
     % Compute the design matrix for a given run by convolving the 
     % regressors with the HRF. Useful for plotting and sanity checks.
@@ -23,15 +23,11 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
     % Momchil Tomov, Aug 2018
 
 
-    res = 100;
+    res = 1000; % ms res
     multi = EXPT.create_multi(glmodel, subj, run);
 
     % find max onset
-    max_onset = 0;
-    for j = 1:length(multi.names)
-        max_onset = max(max_onset, max(multi.onsets{j}));
-    end
-    max_onset = max_onset * res;
+    run_dur = EXPT.run_duration * res; % s => ms
 
     % iterate over events
     names = {};
@@ -39,7 +35,12 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
         onsets = multi.onsets{j} * res;
         durations = multi.durations{j} * res;
 
-        x = populate_regressor(onsets, durations, ones(size(onsets)), max_onset);
+        x = populate_regressor(onsets, durations, ones(size(onsets)), run_dur);
+        if j == 1
+            X_nohrf = x(1:res:end);
+        else
+            X_nohrf = [X_nohrf x(1:res:end)];
+        end
         x = convolve_and_subsample(x, res);
         if j == 1
             X = x;
@@ -53,7 +54,8 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
             for k = 1:length(multi.pmod(j).name)
                 assert(length(onsets) == length(multi.pmod(j).param{k}), ['multi.pmod(', num2str(j), ').param{', num2str(k), '} has the wrong number of elements']);
 
-                x = populate_regressor(onsets, durations, multi.pmod(j).param{k}, max_onset);
+                x = populate_regressor(onsets, durations, multi.pmod(j).param{k}, run_dur);
+                X_nohrf = [X_nohrf x(1:res:end)];
                 x = convolve_and_subsample(x, res);
                 X = [X x];
                 names = [names, multi.pmod(j).name(k)];
@@ -64,10 +66,10 @@ function [X, names] = ccnl_get_design(EXPT, glmodel, subj, run)
 end
 
 
-function x = populate_regressor(onsets, durations, values, max_onset)
-    x = zeros(ceil(max_onset),1);
+function x = populate_regressor(onsets, durations, values, max_time)
+    x = zeros(ceil(max_time),1);
     for i = 1:length(onsets)
-        x(round(onsets(i)):round(min(max_onset, onsets(i)+durations(i)))) = values(i);
+        x(round(onsets(i)):round(min(max_time, onsets(i)+durations(i)))) = values(i);
     end
 end
 

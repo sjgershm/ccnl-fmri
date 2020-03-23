@@ -43,20 +43,33 @@ if nargin < 3
     subjs = 1:length(EXPT.subject);
 end
 
+if do_plot
+    figure;
+end
+
 for glmodel = glmodels
     for subj = subjs
         if all_runs
             runs = 1:length(EXPT.subject(subj).functional);
         end
         for run = runs
-            [X, names] = ccnl_get_design(EXPT, glmodel, subj, run);
+            [X, names, X_nohrf] = ccnl_get_design(EXPT, glmodel, subj, run);
 
             % optionally plot regressors
             if do_plot
                 for i = 1:size(X,2)
                     subplot(size(X,2), 1, i);
-                    plot(X(:,i));
-                    legend(names(i), 'Interpreter', 'none');
+                    plot(X_nohrf(:,i), 'color', 'red');
+                    hold on;
+                    plot(X(:,i), 'color', 'blue');
+                    legend({names{i}, [names{i}, ' x HRF']}, 'Interpreter', 'none');
+
+                    if i == 1
+                        title(sprintf('Subject %d, run %d', subj, run));
+                    end
+                    if i == size(X,2)
+                        xlabel('seconds');
+                    end
                 end
             end
 
