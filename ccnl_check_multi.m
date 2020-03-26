@@ -53,16 +53,21 @@ for glmodel = glmodels
             runs = 1:length(EXPT.subject(subj).functional);
         end
         for run = runs
-            [X, names, X_nohrf] = ccnl_get_design(EXPT, glmodel, subj, run);
+            [X, names, X_raw, res] = ccnl_get_design(EXPT, glmodel, subj, run);
 
             % optionally plot regressors
             if do_plot
                 for i = 1:size(X,2)
                     subplot(size(X,2), 1, i);
-                    plot(X_nohrf(:,i), 'color', 'red');
+                    c = 0:1.0/res:size(X,1);
+                    c = c(1:size(X_raw,1));
+                    plot(c, X_raw(:,i), 'color', 'red');
                     hold on;
-                    plot(X(:,i), 'color', 'blue');
+                    plot(0:size(X,1)-1, X(:,i), 'color', 'blue');
                     legend({names{i}, [names{i}, ' x HRF']}, 'Interpreter', 'none');
+                    ymin = min(min(X_raw(:)), min(X(:)));
+                    ymax = max(max(X_raw(:)), max(X(:)));
+                    ylim([ymin - 0.05, ymax + 0.05]);
 
                     if i == 1
                         title(sprintf('Subject %d, run %d', subj, run));

@@ -1,4 +1,4 @@
-function [X, names, X_nohrf] = ccnl_get_design(EXPT, glmodel, subj, run)
+function [X, names, X_raw, res] = ccnl_get_design(EXPT, glmodel, subj, run)
 
     % Compute the design matrix for a given run by convolving the 
     % regressors with the HRF. Useful for plotting and sanity checks.
@@ -16,6 +16,8 @@ function [X, names, X_nohrf] = ccnl_get_design(EXPT, glmodel, subj, run)
     % OUTPUT:
     %   X = [nSeconds x nRegressors] design matrix for given run (assuming TR = 1 s)
     %   names = [1 x nRegressors] cell array of regressor names
+    %   X_raw = [nSeconds*res x nRegressors] raw regressors, not convolved & subsampled
+    %   res = resolution (ms)
     %
     % EXAMPLE:
     %   [X, names] = ccnl_get_design(exploration_expt(), 18, 1, 1)
@@ -37,9 +39,9 @@ function [X, names, X_nohrf] = ccnl_get_design(EXPT, glmodel, subj, run)
 
         x = populate_regressor(onsets, durations, ones(size(onsets)), run_dur);
         if j == 1
-            X_nohrf = x(1:res:end);
+            X_raw = x;
         else
-            X_nohrf = [X_nohrf x(1:res:end)];
+            X_raw = [X_raw x];
         end
         x = convolve_and_subsample(x, res);
         if j == 1
@@ -55,7 +57,7 @@ function [X, names, X_nohrf] = ccnl_get_design(EXPT, glmodel, subj, run)
                 assert(length(onsets) == length(multi.pmod(j).param{k}), ['multi.pmod(', num2str(j), ').param{', num2str(k), '} has the wrong number of elements']);
 
                 x = populate_regressor(onsets, durations, multi.pmod(j).param{k}, run_dur);
-                X_nohrf = [X_nohrf x(1:res:end)];
+                X_raw = [X_raw x];
                 x = convolve_and_subsample(x, res);
                 X = [X x];
                 names = [names, multi.pmod(j).name(k)];
