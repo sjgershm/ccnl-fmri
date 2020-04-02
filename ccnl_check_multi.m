@@ -65,9 +65,9 @@ for glmodel = glmodels
                     hold on;
                     plot(0:size(X,1)-1, X(:,i), 'color', 'blue');
                     legend({names{i}, [names{i}, ' x HRF']}, 'Interpreter', 'none');
-                    ymin = min(min(X_raw(:)), min(X(:)));
-                    ymax = max(max(X_raw(:)), max(X(:)));
-                    ylim([ymin - 0.05, ymax + 0.05]);
+                    ymin = min(min(X_raw(:,i)), min(X(:,i)));
+                    ymax = max(max(X_raw(:,i)), max(X(:,i)));
+                    ylim([ymin - 0.15, ymax + 0.15]);
 
                     if i == 1
                         title(sprintf('Subject %d, run %d', subj, run));
@@ -102,7 +102,7 @@ for glmodel = glmodels
                     disp(s);
                 end
 
-                assert(false);
+                assert(false, 'Found linearly dependent regressors -- see details above');
             end
         end
     end
