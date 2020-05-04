@@ -39,10 +39,9 @@ function [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, 
                 assert(isequal(size(Neural(n).subj(s).RDM), size(Behavioral(m).subj(s).RDM)), 'Neural and behavioral RDMs should be equal -- check rsa.which_trials');
 
                 upper = logical(triu(ones(size(Neural(n).subj(s).RDM)), 1)); % only take values above main diagonal
+                upper = upper & Behavioral(m).subj(s).run_RDM; % don't compare within the same run! BOLD is VERY autocorrelated
                     
                 neural_RDM = Neural(n).subj(s).RDM(upper); 
-                %neural_RDM = neural_RDM(randperm(size(neural_RDM, 1)), randperm(size(neural_RDM, 2))); TODO null distribution?
-
                 behavioral_RDM = Behavioral(m).subj(s).RDM(upper);
 
                 % control RDMs
