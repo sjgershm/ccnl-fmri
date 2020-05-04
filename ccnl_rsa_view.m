@@ -1,56 +1,53 @@
-function ccnl_rsa_view(EXPT, rsa_idx, model_idx)
+function ccnl_rsa_view(EXPT, rsa_idx, model_idx, T, all_subject_rhos, roi_masks)
 
-    % View RSA group-level t-map from ccnl_rsa_searchlight.
+    % View RSA group-level t-map from ccnl_rsa.
     % Requires bspmview.
     %
     % USAGE:
-    %   ccnl_rsa_view(EXPT, rsa_idx, model_idx)
+    %   ccnl_rsa_view(EXPT, rsa_idx, model_idx, T, roi_masks)
     %
     % INPUT:
     %   EXPT - experiment structure
     %   rsa_idx - which RSA to use 
     %   model_idx - which model to show 
+    %   T - t-stats for each ROI, as returned by ccnl_rsa
+    %   all_subject_rhos - rho's for all subjects, as returned by ccnl_rsa
+    %   roi_masks -- ROI mask as passed to ccnl_rsa
     %
-    % Momchil Tomov, Oct 2018
+    % Momchil Tomov, May 2020 
 
     rsadir = fullfile(EXPT.rsadir,['rsa',num2str(rsa_idx)]);
 
     % create sample rsa
     rsa = EXPT.create_rsa(rsa_idx, 1);
+    rsadir
 
     % initialize empty tmap
     V = spm_vol(rsa.mask);
     tmap = nan(V.dim);
 
     % hacks to make it save the t-map as a t-map
-    V.fname = fullfile(rsadir, ['searchlight_tmap_', num2str(model_idx), '.nii']); % change immediately!
+    V.fname = fullfile(rsadir, ['temp_tmap_', num2str(model_idx), '.nii']); % change immediately!
     V.dt = [16 0];
     V.private.dat.dtype = 'FLOAT32-LE';
     V.private.dat.fname = V.fname;
 
-    % compute t-map, if it hasn't been computed already
-    if ~exist(V.fname, 'file')
-        df = NaN;
-        files = dir(rsadir);
-        for i = 1:length(files)
-            file = files(i).name;
-            if startsWith(file, 'searchlight_') && endsWith(file, '.mat')
-                disp(['Loading ', file]);
-                load(fullfile(rsadir, file));
+    df = size(all_subject_rhos, 3) - 1;
+    for i = 1:length(roi_masks)
+        roi_mask = roi_masks{i};
 
-                for j = 1:size(cor, 1)
-                    tmap(cor(j,1), cor(j,2), cor(j,3)) = T(j, model_idx);
-                end
-                df = size(all_subject_rhos, 3) - 1;
-            end
-        end
+        % load roi mask
+        [roi_mask_format, roi_mask] = get_mask_format_helper(roi_mask);
+        assert(strcmp(roi_mask_format, 'mask'), 'Improper mask');
 
-        V.descrip = sprintf('SPM{T_[%d.0]}', df); % hack to write the degrees of freedom, to allow thresholding in bspmview
-
-        % save tmap
-        V.fname
-        spm_write_vol(V, tmap);
+        tmap(roi_mask) = T(i, model_idx);
     end
+
+    %V.descrip = sprintf('SPM{T_[%d.0]}', df); % hack to write the degrees of freedom, to allow thresholding in bspmview
+
+    % save tmap
+    V.fname
+    spm_write_vol(V, tmap);
 
     % view tmap
     struc = fullfile(EXPT.modeldir,'mean.nii');
