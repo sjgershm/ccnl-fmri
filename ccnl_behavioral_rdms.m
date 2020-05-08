@@ -53,7 +53,7 @@ function [Behavioral, control] = ccnl_behavioral_rdms(EXPT, rsa_idx, subjects)
                 assert(isequal(Behavioral(i).name, rsa.model(i).name));
                 assert(Behavioral(i).is_control == rsa.model(i).is_control);
             end
-            Behavioral(i).subj(s).name = Behavioral(i).name;
+            Behavioral(i).subj(s).name = [Behavioral(i).name, ', subj=', num2str(subj)];
             Behavioral(i).subj(s).features = rsa.model(i).features;
             Behavioral(i).subj(s).runs = rsa.model(i).runs;
             Behavioral(i).subj(s).id = subj;

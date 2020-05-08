@@ -57,24 +57,35 @@ for glmodel = glmodels
 
             % optionally plot regressors
             if do_plot
-                for i = 1:size(X,2)
-                    subplot(size(X,2), 1, i);
-                    c = 0:1.0/res:size(X,1);
-                    c = c(1:size(X_raw,1));
-                    plot(c, X_raw(:,i), 'color', 'red');
-                    hold on;
-                    plot(0:size(X,1)-1, X(:,i), 'color', 'blue');
-                    legend({names{i}, [names{i}, ' x HRF']}, 'Interpreter', 'none');
-                    ymin = min(min(X_raw(:,i)), min(X(:,i)));
-                    ymax = max(max(X_raw(:,i)), max(X(:,i)));
-                    ylim([ymin - 0.15, ymax + 0.15]);
 
-                    if i == 1
-                        title(sprintf('Subject %d, run %d', subj, run));
+                if size(X,2) < 30
+                    % not too many regressors: plot normally
+                    for i = 1:size(X,2)
+                        subplot(size(X,2), 1, i);
+                        c = 0:1.0/res:size(X,1);
+                        c = c(1:size(X_raw,1));
+                        plot(c, X_raw(:,i), 'color', 'red');
+                        hold on;
+                        plot(0:size(X,1)-1, X(:,i), 'color', 'blue');
+                        legend({names{i}, [names{i}, ' x HRF']}, 'Interpreter', 'none');
+                        ymin = min(min(X_raw(:,i)), min(X(:,i)));
+                        ymax = max(max(X_raw(:,i)), max(X(:,i)));
+                        ylim([ymin - 0.15, ymax + 0.15]);
+
+                        if i == 1
+                            title(sprintf('Subject %d, run %d', subj, run));
+                        end
+                        if i == size(X,2)
+                            xlabel('seconds');
+                        end
                     end
-                    if i == size(X,2)
-                        xlabel('seconds');
-                    end
+                else
+                    % lots of regressors: plot matrix
+                    imagesc(X);
+                    ylabel('TR');
+                    xlabel('regressor');
+                    colorbar;
+                    title(sprintf('Subject %d, run %d', subj, run));
                 end
             end
 

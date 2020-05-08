@@ -40,7 +40,7 @@ function [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, 
 
                 upper = logical(triu(ones(size(Neural(n).subj(s).RDM)), 1)); % only take values above main diagonal
                 upper = upper & Behavioral(m).subj(s).run_RDM; % don't compare within the same run! BOLD is VERY autocorrelated
-                    
+
                 neural_RDM = Neural(n).subj(s).RDM(upper); 
                 behavioral_RDM = Behavioral(m).subj(s).RDM(upper);
 

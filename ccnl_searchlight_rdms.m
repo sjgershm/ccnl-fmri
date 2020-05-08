@@ -71,11 +71,15 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
 
         rsa = EXPT.create_rsa(rsa_idx, subj);
 
-        betas_filename = fullfile(rsadir, sprintf('betas_%d.mat', subj));
-        disp(betas_filename);
+        if rsa.use_beta_series
+            filename = fullfile(rsadir, sprintf('betas_%d.mat', subj));
+        else
+            filename = fullfile(rsadir, sprintf('BOLD_%d.mat', subj));
+        end
+        disp(filename);
 
         % load (cached) betas
-        if ~exist(betas_filename, 'file')
+        if ~exist(filename, 'file')
             tic
             disp('loading betas from .nii files...');
 
@@ -84,24 +88,32 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
             load(fullfile(modeldir,'SPM.mat'));
             assert(isequal(SPM.Vbeta(1).dim, Vmask.dim), 'Different dimensions between mask and betas');
 
-            which = contains(SPM.xX.name, rsa.event); % betas for given event
-            which(which) = rsa.which_betas; % of those, only betas for given trials
-            cdir = pwd;
-            cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
-            B = spm_data_read(SPM.Vbeta(which), find(mask));
-            cd(cdir);
+            if rsa.use_beta_series
+                % load betas
+                %
+                which = contains(SPM.xX.name, rsa.event); % betas for given event
+                which(which) = rsa.which_betas; % of those, only betas for given trials
+                cdir = pwd;
+                cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
+                B = spm_data_read(SPM.Vbeta(which), find(mask));
+                cd(cdir);
+            else
+                % load BOLD
+                %
+                B = spm_data_read(SPM.xY.VY, find(mask));
+            end
 
             % save file in "lock-free" fashion
             % b/c parallel jobs might be doing the same
-            tmp_filename = [betas_filename, random_string()];
+            tmp_filename = [filename, random_string()];
             save(tmp_filename, 'B', '-v7.3');
-            movefile(tmp_filename, betas_filename); % TODO assumes this is instantaneous
+            movefile(tmp_filename, filename); % TODO assumes this is instantaneous
 
             toc
         else
             tic
             disp('loading cached betas from .mat file...');
-            load(betas_filename);
+            load(filename);
             toc
         end
 

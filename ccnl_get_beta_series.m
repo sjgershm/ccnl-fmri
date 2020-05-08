@@ -2,6 +2,7 @@ function B = ccnl_get_beta_series(EXPT, glmodel, subj, substring, mask)
 
     % Extracts beta coefficients for all regressors that contain a given substring.
     % Useful for MVPA, beta series correlation and PPI.
+    % Note that it's not recommended if events are closer than ~8 s together (Poldrack's 2011 handbook of fMRI, section 8.2.3)
     %
     % USAGE: 
     %   B = ccnl_get_beta_series(EXPT, model, subj, substring, mask)

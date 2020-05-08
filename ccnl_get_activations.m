@@ -1,4 +1,4 @@
-function activations = ccnl_get_activations(EXPT,model,mask,subjects)
+function activations = ccnl_get_activations(EXPT,model,mask,subjects,apply_filter)
     
     % Extract activation coefficients from a mask.
     % Caution: don't use for too many voxels
@@ -14,13 +14,20 @@ function activations = ccnl_get_activations(EXPT,model,mask,subjects)
     %          or a list of voxels in native coordinates as a [N x 3] matrix
     %          (use mni2cor first if coordinates are in MNI space)
     %   subjects (optional) - which subjects to analyze (default all subjects)
+    %   apply_filter (optional) - whether to high-pass filter data like SPM does (default false)
     %
     % OUTPUTS:
     %   activations - [nScans x nVoxels x nSubjects] activations
     %
     % Momchil Tomov, Aug 2018
-    
-    if nargin < 4; subjects = 1:length(EXPT.subject); end
+   
+    if ~exist('subjects', 'var')
+        subjects = 1:length(EXPT.subject);
+    end
+
+    if ~exist('apply_filter', 'var')
+        apply_filter = false;
+    end
 
     % load mask
     [mask_format, mask, Vmask] = get_mask_format_helper(mask);
@@ -42,10 +49,12 @@ function activations = ccnl_get_activations(EXPT,model,mask,subjects)
             Y = spm_data_read(SPM.xY.VY, mask);
         end
 
-        %-Whiten/Weight data and remove filter confounds
-        KWY = spm_filter(SPM.xX.K,SPM.xX.W*Y);
+        if apply_filter
+            % high-pass filter data
+            Y = spm_filter(SPM.xX.K,Y);
+        end
 
-        activations(:,:,s) = KWY;
+        activations(:,:,s) = Y;
 
         fprintf('Computed activations for subject %d\n', subj);
     end
