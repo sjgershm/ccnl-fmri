@@ -1,4 +1,4 @@
-function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects)
+function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, return_B)
 
     % Compute the neural RDMs for given ROIs. Also see ccnl_searchlight_rdms.m
     % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
@@ -15,6 +15,7 @@ function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects)
     %   rsa_idx - which RSA to use 
     %   roi_masks - mask name or cell array of mask names. Could pass 3D masks instead.
     %   subjects - (optional) list of subjects
+    %   return_B - (optional) return neural activity (BOLD or betas) used to generate RDM as part of Neural (default to false because it's too big)
     %
     % OUTPUT:
     %   Neural - struct array, one element per sphere, with the fields:
@@ -34,6 +35,10 @@ function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects)
 
     if ~exist('subjects', 'var')
         subjects = 1:length(EXPT.subject);
+    end
+
+    if ~exist('return_B', 'var')
+        return_B = false;
     end
 
     % TODO dedupe with ccnl_searchlight_rdms.m
@@ -135,8 +140,11 @@ function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects)
             Neural(i).subj(s).id = subj;
             Neural(i).name = mask_name;
             Neural(i).subj(s).name = Neural(i).name;
-            Neural(i).event = rsa.event;
+            %Neural(i).event = rsa.event;
             Neural(i).num_voxels = sum(roi_mask(:));
+            if return_B
+                Neural(i).subj(s).B = B(:, find(roi_mask(mask)));
+            end
         end
 
         toc

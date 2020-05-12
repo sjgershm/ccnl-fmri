@@ -1,4 +1,4 @@
-% helper function that figures out the what format a lit of voxels is in
+% helper function that figures out the what format a list of voxels is in
 % potentially actually loads the mask
 %
 % Momchil Tomov, Aug 2018

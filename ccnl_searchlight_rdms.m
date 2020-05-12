@@ -143,7 +143,7 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
             Neural(i).name = ['sphere_', sprintf('%d_%d_%d', Neural(i).mni), '_', rsa.event];
             Neural(i).subj(s).name = Neural(i).name;
             Neural(i).radius = radius;
-            Neural(i).event = rsa.event;
+            %Neural(i).event = rsa.event;
             Neural(i).idx = inds(i);
             Neural(i).num_voxels = sum(sphere_mask(:));
         end
