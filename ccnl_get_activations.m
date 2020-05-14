@@ -14,8 +14,8 @@ function activations = ccnl_get_activations(EXPT,model,mask,subjects,whiten,filt
     %          or a list of voxels in native coordinates as a [N x 3] matrix
     %          (use mni2cor first if coordinates are in MNI space)
     %   subjects (optional) - which subjects to analyze (default all subjects)
-    %   whiten (optional) - whether to whiten data like SPM does (default false)
-    %   filter (optional) - whether to high-pass filter data like SPM does (default false)
+    %   whiten (optional) - whether to whiten data like SPM does (default true, like SPM)
+    %   filter (optional) - whether to high-pass filter data like SPM does (default true, like SPM)
     %
     % OUTPUTS:
     %   activations{s} - [nScans x nVoxels] activations for subject s
@@ -27,11 +27,11 @@ function activations = ccnl_get_activations(EXPT,model,mask,subjects,whiten,filt
     end
 
     if ~exist('whiten', 'var')
-        whiten = false;
+        whiten = true;
     end
 
     if ~exist('filter', 'var')
-        filter = false;
+        filter = true;
     end
 
     % load mask

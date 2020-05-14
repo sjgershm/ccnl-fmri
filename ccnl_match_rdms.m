@@ -26,6 +26,9 @@ function [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, 
     T = []; % t-value of hypothesis test for each ROI for each model
     P = []; % p-value of hypothesis test for each ROI for each model
 
+    disp('matching RDMs...');
+    tic
+
     for n = 1:length(Neural)
         fprintf('ROI #%d\n', n);
 
@@ -79,4 +82,6 @@ function [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, 
         P(n,:) = ps;
         T(n,:) = stats.tstat;
     end
+
+    toc
 

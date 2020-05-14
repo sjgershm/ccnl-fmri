@@ -85,7 +85,7 @@ function dec = ccnl_decode_regressor(EXPT, glmodel, regressor, mask, lambda, sub
 
         % extract activations 
         act = ccnl_get_activations(EXPT, glmodel, mask, subj);
-        %act = spm_filter(SPM.xX.K,SPM.xX.W*act); % whiten & high-pass filter (see spm_spm.m)
+        act = act{1};
 
         % decode regressor
         if length(lambda) == 1
