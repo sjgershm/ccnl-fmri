@@ -1,9 +1,9 @@
-function activations = ccnl_get_activations(EXPT,model,mask,subjects,whiten,filter)
+function [activations, runs] = ccnl_get_activations(EXPT,model,mask,subjects,whiten,filter)
     
     % Extract activation coefficients from a mask.
     % Caution: don't use for too many voxels
     %
-    % USAGE: activations = ccnl_get_activations(EXPT,model,mask,[subjects])
+    % USAGE: [activations, runs] = ccnl_get_activations(EXPT,model,mask,[subjects])
     %
     % INPUTS:
     %   EXPT - experiment structure
@@ -19,6 +19,7 @@ function activations = ccnl_get_activations(EXPT,model,mask,subjects,whiten,filt
     %
     % OUTPUTS:
     %   activations{s} - [nScans x nVoxels] activations for subject s
+    %   runs{s} - [nScans x 1] run/session IDs for subject s
     %
     % Momchil Tomov, Aug 2018
    
@@ -65,6 +66,10 @@ function activations = ccnl_get_activations(EXPT,model,mask,subjects,whiten,filt
         end
 
         activations{s} = Y;
+
+        for r = 1:length(SPM.Sess)
+            runs{s}(SPM.Sess(r).row,:) = r;
+        end
 
         fprintf('Computed activations for subject %d\n', subj);
     end
