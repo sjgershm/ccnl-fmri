@@ -47,6 +47,7 @@ function [activations, runs] = ccnl_get_activations(EXPT,model,mask,subjects,whi
         modeldir = fullfile(EXPT.modeldir,['model',num2str(model)],['subj',num2str(subj)]);
         load(fullfile(modeldir,'SPM.mat'));
         assert(isempty(Vmask) || isequal(SPM.xY.VY(1).dim, Vmask.dim), 'Different dimensions between mask and activations');
+        assert(ndims(mask) < 3 || isequal(SPM.Vbeta(1).dim, size(mask)), 'Different dimensions between mask and betas');
        
         % extract voxel activations
         if strcmp(mask_format, 'cor')

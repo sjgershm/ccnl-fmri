@@ -72,25 +72,17 @@ function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, return_B)
         % load (cached) betas
         if ~exist(filename, 'file')
             tic
-            disp('loading betas from .nii files...');
-
-            modeldir = fullfile(EXPT.modeldir,['model',num2str(rsa.glmodel)],['subj',num2str(subj)]);
-            load(fullfile(modeldir,'SPM.mat'));
-            assert(isequal(SPM.Vbeta(1).dim, Vmask.dim), 'Different dimensions between mask and betas');
+            disp('loading betas or BOLD from .nii files...');
 
             if rsa.use_beta_series
                 % load betas
                 %
-                which = contains(SPM.xX.name, rsa.event); % betas for given event
-                which(which) = rsa.which_betas; % of those, only betas for given trials
-                cdir = pwd;
-                cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
-                B = spm_data_read(SPM.Vbeta(which), find(mask));
-                cd(cdir);
+                B = ccnl_get_beta_series(EXPT, rsa.glmodel, subj, rsa.event, rsa.mask);
             else
                 % load BOLD
                 %
-                B = spm_data_read(SPM.xY.VY, find(mask));
+                B = ccnl_get_activations(EXPT, rsa.glmodel, rsa.mask, subj, true, true); % whiten & filter; see Diedrichsen et al. 2016
+                B = B{1};
             end
 
             % save file in "lock-free" fashion

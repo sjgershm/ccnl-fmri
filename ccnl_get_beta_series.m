@@ -1,4 +1,4 @@
-function B = ccnl_get_beta_series(EXPT, glmodel, subj, substring, mask)
+function [B, names] = ccnl_get_beta_series(EXPT, glmodel, subj, substring, mask)
 
     % Extracts beta coefficients for all regressors that contain a given substring.
     % Useful for MVPA, beta series correlation and PPI.
@@ -27,6 +27,7 @@ function B = ccnl_get_beta_series(EXPT, glmodel, subj, substring, mask)
     %
     % OUTPUTS:
     %   beta - [nTrials x nVoxels] beta coefficients
+    %   names - {nTrials x 1} cell array of regressor names
     %
     % Momchil Tomov, Apr 2019
 
@@ -37,13 +38,15 @@ function B = ccnl_get_beta_series(EXPT, glmodel, subj, substring, mask)
     % load betas 
     modeldir = fullfile(EXPT.modeldir,['model',num2str(glmodel)],['subj',num2str(subj)]);
     load(fullfile(modeldir,'SPM.mat'));
-    %assert(isequal(SPM.Vbeta(1).dim, Vmask.dim), 'Different dimensions between mask and betas');
+    assert(isempty(Vmask) || isequal(SPM.Vbeta(1).dim, Vmask.dim), 'Different dimensions between mask and betas');
+    assert(ndims(mask) < 3 || isequal(SPM.Vbeta(1).dim, size(mask)), 'Different dimensions between mask and betas');
 
     which = contains(SPM.xX.name, substring); % betas for given event
-    %which(which) = rsa.which_betas; % of those, only betas for given trials
     cdir = pwd;
     cd(modeldir); % b/c SPM.Vbeta are relative to modeldir
     B = spm_data_read(SPM.Vbeta(which), find(mask));
     cd(cdir);
+
+    names = SPM.xX.name(which)';
            
     assert(size(B,1) > 0, 'no betas - likely wrong substring');

@@ -73,7 +73,7 @@ for glmodel = glmodels
                         ylim([ymin - 0.15, ymax + 0.15]);
 
                         if i == 1
-                            title(sprintf('Subject %d, run %d', subj, run));
+                            title(sprintf('GLM %d: Subject %d, run %d', glmodel, subj, run));
                         end
                         if i == size(X,2)
                             xlabel('seconds');
