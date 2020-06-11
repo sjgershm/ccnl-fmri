@@ -23,9 +23,9 @@ function [Behavioral, control] = ccnl_behavioral_rdms(EXPT, rsa_idx, subjects)
     %      .distance_measure - name (e.g. 'cosine') or function handler to be used as a distance measure for the RDMs (passed to pdist, see MATLAB documentation)
     %      .subj - struct array with subject RDMs for given model; has following fields:
     %         .features - [nTrials x D] feature vector
-    %         .runs - [nTrials x 1] run id vector
+    %         .partitions - [nTrials x 1] partition id vector (previously runs)
     %         .RDM - [nTrials x nTrials] RDM based on features
-    %         .run_RDM - [nTrials x nTrials] run logical RDM (to compare across runs only)
+    %         .partition_RDM - [nTrials x nTrials] partition logical RDM (to compare across partitions only; previously run_RDM)
     %   control - indices of models in Behavioral that are controls
     %
     % Momchil Tomov, Sep 2018
@@ -55,7 +55,7 @@ function [Behavioral, control] = ccnl_behavioral_rdms(EXPT, rsa_idx, subjects)
             end
             Behavioral(i).subj(s).name = [Behavioral(i).name, ', subj=', num2str(subj)];
             Behavioral(i).subj(s).features = rsa.model(i).features;
-            Behavioral(i).subj(s).runs = rsa.model(i).runs;
+            Behavioral(i).subj(s).partitions = rsa.model(i).partitions;
             Behavioral(i).subj(s).id = subj;
         end
     end
@@ -66,8 +66,8 @@ function [Behavioral, control] = ccnl_behavioral_rdms(EXPT, rsa_idx, subjects)
             Behavioral(i).subj(s).RDM = squareRDMs(pdist(Behavioral(i).subj(s).features, Behavioral(i).distance_measure));
             assert(sum(any(isnan(Behavioral(i).subj(s).RDM))) == 0, 'Found NaNs in RDM -- should never happen');
 
-            Behavioral(i).subj(s).run_RDM = logical(squareRDMs(pdist(Behavioral(i).subj(s).runs, @(r1, r2) r1 ~= r2)));
-            assert(sum(any(isnan(Behavioral(i).subj(s).run_RDM))) == 0, 'Found NaNs in run RDM -- should never happen');
+            Behavioral(i).subj(s).partition_RDM = logical(squareRDMs(pdist(Behavioral(i).subj(s).partitions, @(r1, r2) r1 ~= r2)));
+            assert(sum(any(isnan(Behavioral(i).subj(s).partition_RDM))) == 0, 'Found NaNs in partition RDM -- should never happen');
         end
     end
 

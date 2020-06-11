@@ -58,7 +58,7 @@ for glmodel = glmodels
             % optionally plot regressors
             if do_plot
 
-                if size(X,2) < 30
+                if size(X,2) < 35
                     % not too many regressors: plot normally
                     for i = 1:size(X,2)
                         subplot(size(X,2), 1, i);
