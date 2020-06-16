@@ -1,10 +1,10 @@
-function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks, subjects)
+function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks, subjects, corr_type, distance_metric)
 
     % RSA for given ROIs. Also see ccnl_rsa_searchlight.m
     % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
     %
     % USAGE:
-    %   [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks)    
+    %   [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks, [corr_type], [distance_metric])    
     %
     % EXAMPLE:
     %   [Rho, ~, T, P] = ccnl_rsa(exploration_expt(), 1, 'masks/hippocampus.nii');
@@ -14,6 +14,8 @@ function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, r
     %   rsa_idx - which RSA to use 
     %   roi_masks - mask name or cell array of mask names. Could pass 3D masks instead.
     %   subjects - (optional) list of subjects
+    %   corr_type - (optional) type of (rank) correlation between RDMs (default: Spearman)
+    %   distance_metric - (optional) neural distance metric (default: cosine)
     %
     % OUTPUT:
     %   Rho - [nROIs x nModels] matrix of Spearman rank correlations (averaged across subjects)
@@ -30,6 +32,14 @@ function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, r
         subjects = 1:length(EXPT.subject);
     end
 
+    if ~exist('corr_type', 'var')
+        corr_type = 'Spearman';
+    end
+
+    if ~exist('distance_metric', 'var') 
+        distance_metric = 'cosine';
+    end
+
     % create rsa folder if none exists
     if ~isdir(EXPT.rsadir); mkdir(EXPT.rsadir); end
     rsadir = fullfile(EXPT.rsadir,['rsa',num2str(rsa_idx)]);
@@ -39,8 +49,8 @@ function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, r
     [Behavioral, control] = ccnl_behavioral_rdms(EXPT, rsa_idx, subjects);
 
     % get searchlight RDMs
-    [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects);
+    [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, false, distance_metric);
 
     % compute second-order correlations (similarity match)
-    [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, control);
+    [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, control, corr_type);
 

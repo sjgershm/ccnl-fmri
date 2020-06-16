@@ -1,10 +1,10 @@
-function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, return_B)
+function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, return_B, distance_metric)
 
     % Compute the neural RDMs for given ROIs. Also see ccnl_searchlight_rdms.m
     % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
     %
     % USAGE:
-    %   [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks [, subjects])
+    %   [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks [, subjects], [return_B], [distance_metric])
     %
     % EXAMPLE:
     %   [Neural] = ccnl_roi_rdms(exploration_expt(), 1, 'masks/hippocampus.nii')
@@ -15,7 +15,8 @@ function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, return_B)
     %   rsa_idx - which RSA to use 
     %   roi_masks - mask name or cell array of mask names. Could pass 3D masks instead.
     %   subjects - (optional) list of subjects
-    %   return_B - (optional) return neural activity (BOLD or betas) used to generate RDM as part of Neural (default to false because it's too big)
+    %   return_B - (optional) whether to return neural activity (BOLD or betas) used to generate RDM as part of Neural (default to false because it's too big)
+    %   distance_metric - (optional) neural distance metric (default: cosine)
     %
     % OUTPUT:
     %   Neural - struct array, one element per sphere, with the fields:
@@ -35,6 +36,10 @@ function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, return_B)
 
     if ~exist('subjects', 'var')
         subjects = 1:length(EXPT.subject);
+    end
+
+    if ~exist('distance_metric', 'var') 
+        distance_metric = 'cosine';
     end
 
     if ~exist('return_B', 'var')
@@ -124,7 +129,7 @@ function [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, return_B)
                 % sometimes (rarely) they're all NaNs
                 Neural(i).subj(s).RDM = [];
             else
-                Neural(i).subj(s).RDM = squareRDMs(pdist(B(:, find(roi_mask(mask))), 'cosine'));
+                Neural(i).subj(s).RDM = squareRDMs(pdist(B(:, find(roi_mask(mask))), distance_metric));
             end
             assert(sum(any(isnan(Neural(i).subj(s).RDM))) == 0, 'Found NaNs in RDM -- should never happen');
 
