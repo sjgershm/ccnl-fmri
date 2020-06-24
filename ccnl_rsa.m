@@ -1,13 +1,13 @@
-function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks, subjects, corr_type, distance_metric)
+function [C, H, T, P, all_subject_ceof, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks, subjects, corr_type, distance_metric)
 
     % RSA for given ROIs. Also see ccnl_rsa_searchlight.m
     % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
     %
     % USAGE:
-    %   [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks, [corr_type], [distance_metric])    
+    %   [C, H, T, P, all_subject_coef, Behavioral, Neural] = ccnl_rsa(EXPT, rsa_idx, roi_masks, [corr_type], [distance_metric])    
     %
     % EXAMPLE:
-    %   [Rho, ~, T, P] = ccnl_rsa(exploration_expt(), 1, 'masks/hippocampus.nii');
+    %   [C, ~, T, P] = ccnl_rsa(exploration_expt(), 1, 'masks/hippocampus.nii');
     %
     % INPUT:
     %   EXPT - experiment structure
@@ -18,11 +18,11 @@ function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, r
     %   distance_metric - (optional) neural distance metric (default: cosine)
     %
     % OUTPUT:
-    %   Rho - [nROIs x nModels] matrix of Spearman rank correlations (averaged across subjects)
+    %   C - [nROIs x nModels] matrix of (rank) correlations (averaged across subjects)
     %   H - [nROIs x nModels] matrix of hypothesis outcomes
     %   T - [nROIs x nModels] matrix of t-statistics
     %   P - [nROIs x nModels] matrix of p-values
-    %   all_subject_rhos - [nROIs x nModels x nSubjects] matrix of Spearman rank correlations
+    %   all_subject_ceof - [nROIs x nModels x nSubjects] matrix of (rank) correlations
     %   Behavioral - struct array with behavioral RDMs (see ccnl_behavioral_rdms.m)
     %   Neural - struct array with neural RDMs (see ccnl_roi_rdms.m)
     %
@@ -52,5 +52,5 @@ function [Rho, H, T, P, all_subject_rhos, Behavioral, Neural] = ccnl_rsa(EXPT, r
     [Neural] = ccnl_roi_rdms(EXPT, rsa_idx, roi_masks, subjects, false, distance_metric);
 
     % compute second-order correlations (similarity match)
-    [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, control, corr_type);
+    [C, H, T, P, all_subject_coef] = ccnl_match_rdms(Neural, Behavioral, control, corr_type);
 

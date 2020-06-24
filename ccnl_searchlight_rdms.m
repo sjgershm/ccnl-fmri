@@ -1,4 +1,4 @@
-function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
+function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, radius, subjects, distance_metric)
 
     % Compute the searchlight neural RDMs
     % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
@@ -14,6 +14,7 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
     %   EXPT - experiment structure
     %   rsa_idx - which RSA to use 
     %   inds - which voxels to use for sphere centers, as indices in mask(:)
+    %   radius - (optional) searchlight radius in voxels
     %   subjects - (optional) list of subjects
     %
     % OUTPUT:
@@ -35,6 +36,10 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
         subjects = 1:length(EXPT.subject);
     end
 
+    if ~exist('distance_metric', 'var') 
+        distance_metric = 'cosine';
+    end
+
     % create rsa folder if none exists
     if ~isdir(EXPT.rsadir); mkdir(EXPT.rsadir); end
     rsadir = fullfile(EXPT.rsadir,['rsa',num2str(rsa_idx)]);
@@ -43,7 +48,10 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
     % load example rsa
     rsa = EXPT.create_rsa(rsa_idx, 1);
     mask = rsa.mask;
-    radius = rsa.radius;
+
+    if ~exist('radius', 'var')
+        radius = rsa.radius;
+    end
 
     % load mask
     [mask_format, mask, Vmask] = get_mask_format_helper(mask);
@@ -124,7 +132,7 @@ function [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects)
                 % sometimes (rarely) they're all NaNs
                 Neural(i).subj(s).RDM = [];
             else
-                Neural(i).subj(s).RDM = squareRDMs(pdist(B(:, find(sphere_mask(mask))), 'cosine'));
+                Neural(i).subj(s).RDM = squareRDMs(pdist(B(:, find(sphere_mask(mask))), distance_metric));
             end
             assert(sum(any(isnan(Neural(i).subj(s).RDM))) == 0, 'Found NaNs in RDM -- should never happen');
           

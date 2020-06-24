@@ -1,11 +1,11 @@
-function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subbatch_size, subjects)
+function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, radius, subbatch_size, subjects, corr_type, distance_metric)
 
     % Run searchlight RSA on a set of voxels. Useful to run in 
     % parallel in batches of e.g. 10000 voxels. Also see ccnl_rsa_view.m
     % Requires Kriegeskorte's RSA toolbox: http://www.mrc-cbu.cam.ac.uk/methods-and-resources/toolboxes/license/ (Nili et al., 2014)
     %
     % USAGE:
-    %   ccnl_rsa_searchlight(EXPT, rsa_idx, inds [, subbatch_size, subjects])    
+    %   ccnl_rsa_searchlight(EXPT, rsa_idx, inds, radius, [, subbatch_size, subjects, corr_type, distance_metric, radius])    
     %
     % EXAMPLE:
     %   ccnl_rsa_searchlight(exploration_expt(), 1, 1:10000);
@@ -14,6 +14,7 @@ function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subbatch_size, subjects)
     %   EXPT - experiment structure
     %   rsa_idx - which RSA to use 
     %   inds - the batch: voxel indices in mask to use for searchlight centers
+    %   radius - searchlight radius in voxels
     %   subbatch_size - (optional) partition inds in subbatches of this size. Higher values risk OOM, lower values reload the betas too often and make things slow. Defaults to 1000
     %   subjects - (optional) list of subjects
     %
@@ -27,6 +28,14 @@ function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subbatch_size, subjects)
 
     if ~exist('subbatch_size', 'var')
         subbatch_size = 1000;
+    end
+
+    if ~exist('corr_type', 'var')
+        corr_type = 'Spearman';
+    end
+
+    if ~exist('distance_metric', 'var') 
+        distance_metric = 'cosine';
     end
 
     % create rsa folder if none exists
@@ -52,17 +61,17 @@ function ccnl_rsa_searchlight(EXPT, rsa_idx, inds, subbatch_size, subjects)
         fprintf('\n------- subbatch %d-%d ------\n\n', s, e);
 
         % gen filename
-        filename = sprintf('searchlight_%d-%d_%s.mat', min(inds), max(inds), random_string());
+        filename = sprintf('searchlight_%d-%d_c=%s_d=%s_%s.mat', min(inds), max(inds), corr_type, distance_metric, random_string());
         disp(fullfile(rsadir, filename));
 
         % get searchlight RDMs
-        [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, subjects);
+        [Neural, cor] = ccnl_searchlight_rdms(EXPT, rsa_idx, inds, radius, subjects, distance_metric);
 
         % compute second-order correlations (similarity match)
-        [Rho, H, T, P, all_subject_rhos] = ccnl_match_rdms(Neural, Behavioral, control);
+        [C, H, T, P, all_subject_coef] = ccnl_match_rdms(Neural, Behavioral, control, corr_type);
 
         % save output 
-        save(fullfile(rsadir, filename), 'cor', 'Rho', 'H', 'T', 'P', 'all_subject_rhos', 'inds', 'rsa_idx', '-v7.3');
+        save(fullfile(rsadir, filename), 'cor', 'C', 'H', 'T', 'P', 'all_subject_coef', 'inds', 'rsa_idx', 'corr_type', 'distance_metric', '-v7.3');
     end
 
 end
