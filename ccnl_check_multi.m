@@ -54,6 +54,10 @@ for glmodel = glmodels
         end
         for run = runs
             [X, names, X_raw, res] = ccnl_get_design(EXPT, glmodel, subj, run);
+            if isempty(X)
+                % runs may optionally not have any regressors
+                continue
+            end
 
             % optionally plot regressors
             if do_plot

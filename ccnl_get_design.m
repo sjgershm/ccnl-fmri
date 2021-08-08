@@ -32,7 +32,9 @@ function [X, names, X_raw, res] = ccnl_get_design(EXPT, glmodel, subj, run)
     run_dur = EXPT.run_duration * res; % s => ms
 
     % iterate over events
+    X = [];
     names = {};
+    X_raw = [];
     for j = 1:length(multi.names)
         onsets = multi.onsets{j} * res;
         durations = multi.durations{j} * res;
