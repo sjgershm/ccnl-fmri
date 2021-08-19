@@ -35,6 +35,12 @@ function [X, names, X_raw, res] = ccnl_get_design(EXPT, glmodel, subj, run)
     X = [];
     names = {};
     X_raw = [];
+
+    if ~isfield(multi, 'names')
+        % some runs may not have any regressors
+        return
+    end
+
     for j = 1:length(multi.names)
         onsets = multi.onsets{j} * res;
         durations = multi.durations{j} * res;
