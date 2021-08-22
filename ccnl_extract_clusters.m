@@ -84,9 +84,12 @@ function [V, Y, C, CI, region, extent, stat, mni, cor, results_table, spmT] = cc
         end
         spmT = fullfile(EXPT.modeldir,['model',num2str(model)],['con',num2str(ix)],'spmT_0001.nii');
     end
-    
+
     if ~exist('df', 'var')
-        df = length(EXPT.subject) - 1; 
+        SPM_path = fullfile(EXPT.modeldir,['model',num2str(model)],['con',num2str(ix)],'SPM.mat');
+        load(SPM_path);
+        % get degrees of freedom from SPM file
+        df = SPM.nscan - 1; 
     end
 
     fprintf('bspm_extract_clusters(%s, %f, %s, %f, %d, %d, %d, %s, %s, %d, %d)\n', spmT, p, direct, alpha, Dis, Num, df, atlas_dirpath, atlas_name, clusterFWEcorrect, extent);
